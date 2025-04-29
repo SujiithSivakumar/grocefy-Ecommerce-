@@ -1,0 +1,389 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}GROCEFY || Checkout page{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="bread-inner">
+                    <ul class="bread-list">
+                        <li><a href="{% url 'core:home' %}">Home<i class="ti-arrow-right"></i></a></li>
+                        <li class="active"><a href="javascript:void(0)">Checkout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumbs -->
+            
+<!-- Start Checkout -->
+<section class="shop checkout section">
+    <div class="container">
+        <form class="form" method="POST" action="{% url 'orders:order_create' %}">
+            {% csrf_token %}
+            <div class="row"> 
+                <div class="col-lg-8 col-12">
+                    <div class="checkout-form">
+                        <h2>Make Your Checkout Here</h2>
+                        <p>Please register in order to checkout more quickly</p>
+                        <!-- Form -->
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label>First Name<span>*</span></label>
+                                    <input type="text" name="first_name" placeholder="" value="{{ user.first_name }}">
+                                    {% if form.first_name.errors %}
+                                        <span class='text-danger'>{{ form.first_name.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label>Last Name<span>*</span></label>
+                                    <input type="text" name="last_name" placeholder="" value="{{ user.last_name }}">
+                                    {% if form.last_name.errors %}
+                                        <span class='text-danger'>{{ form.last_name.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label>Email Address<span>*</span></label>
+                                    <input type="email" name="email" placeholder="" value="{{ user.email }}">
+                                    {% if form.email.errors %}
+                                        <span class='text-danger'>{{ form.email.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label>Phone Number <span>*</span></label>
+                                    <input type="number" name="phone" placeholder="" required value="{{ user.profile.phone }}">
+                                    {% if form.phone.errors %}
+                                        <span class='text-danger'>{{ form.phone.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label>Country<span>*</span></label>
+                                    <select name="country" id="country">
+                                        <option value="IN">India</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label>Address Line 1<span>*</span></label>
+                                    <input type="text" name="address1" placeholder="" value="{{ user.profile.address1 }}">
+                                    {% if form.address1.errors %}
+                                        <span class='text-danger'>{{ form.address1.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label>Address Line 2</label>
+                                    <input type="text" name="address2" placeholder="" value="{{ user.profile.address2 }}">
+                                    {% if form.address2.errors %}
+                                        <span class='text-danger'>{{ form.address2.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label>Postal Code</label>
+                                    <input type="text" name="postal_code" placeholder="" value="{{ user.profile.postal_code }}">
+                                    {% if form.postal_code.errors %}
+                                        <span class='text-danger'>{{ form.postal_code.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label>City<span>*</span></label>
+                                    <input type="text" name="city" placeholder="" value="{{ user.profile.city }}">
+                                    {% if form.city.errors %}
+                                        <span class='text-danger'>{{ form.city.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label>State<span>*</span></label>
+                                    <input type="text" name="state" placeholder="" value="{{ user.profile.state }}">
+                                    {% if form.state.errors %}
+                                        <span class='text-danger'>{{ form.state.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <!--/ End Form -->
+                    </div>
+                </div>
+                <div class="col-lg-4 col-12">
+                    <div class="order-details">
+                        <!-- Order Widget -->
+                        <div class="single-widget">
+                            <h2>CART TOTALS</h2>
+                            <div class="content">
+                                <ul>
+                                    <li class="order_subtotal" data-price="{% if cart %}{{ cart.get_total_price }}{% else %}0{% endif %}">Cart Subtotal<span>₹{% if cart %}{{ cart.get_total_price }}{% else %}0.00{% endif %}</span></li>
+                                    <li class="shipping">
+                                        Shipping Cost
+                                        <span>Free</span>
+                                    </li>
+                                    
+                                    {% if cart.coupon %}
+                                    <li class="coupon_price" data-price="{{ cart.get_discount }}">You Save<span>₹{{ cart.get_discount }}</span></li>
+                                    {% endif %}
+                                    
+                                    {% if cart.coupon %}
+                                        <li class="last" id="order_total_price">Total<span>₹{{ cart.get_total_price_after_discount }}</span></li>
+                                    {% else %}
+                                        <li class="last" id="order_total_price">Total<span>₹{% if cart %}{{ cart.get_total_price }}{% else %}0.00{% endif %}</span></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                        <!--/ End Order Widget -->
+                        <!-- Order Widget -->
+                        <div class="single-widget">
+                            <h2>PAYMENTS</h2>
+                            <div class="content">
+                                <div class="checkbox">
+                                    <form-group>
+                                        <input name="payment_method" type="radio" value="cod" checked> <label> Cash On Delivery</label><br>
+                                        <input name="payment_method" type="radio" value="paypal"> <label> UPI</label> 
+                                    </form-group>
+                                </div>
+                            </div>
+                        </div>
+                        <!--/ End Order Widget -->
+                        <!-- Payment Method Widget -->
+                        <div class="single-widget payement">
+                            <div class="content">
+                                <img src="{% static 'images/payment-method.png' %}" alt="#">
+                            </div>
+                        </div>
+                        <!--/ End Payment Method Widget -->
+                        <!-- Button Widget -->
+                        <div class="single-widget get-button">
+                            <div class="content">
+                                <div class="button">
+                                    <button type="submit" class="btn checkout-btn">PROCEED TO CHECKOUT</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!--/ End Button Widget -->
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+<!--/ End Checkout -->
+
+<!-- Start Shop Services Area  -->
+<section class="shop-services section home">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-6 col-12">
+                <!-- Start Single Service -->
+                <div class="single-service">
+                    <i class="ti-rocket"></i>
+                    <h4>Free shiping</h4>
+                    <p>Orders over $100</p>
+                </div>
+                <!-- End Single Service -->
+            </div>
+            <div class="col-lg-3 col-md-6 col-12">
+                <!-- Start Single Service -->
+                <div class="single-service">
+                    <i class="ti-reload"></i>
+                    <h4>Free Return</h4>
+                    <p>Within 30 days returns</p>
+                </div>
+                <!-- End Single Service -->
+            </div>
+            <div class="col-lg-3 col-md-6 col-12">
+                <!-- Start Single Service -->
+                <div class="single-service">
+                    <i class="ti-lock"></i>
+                    <h4>Secure Payment</h4>
+                    <p>100% secure payment</p>
+                </div>
+                <!-- End Single Service -->
+            </div>
+            <div class="col-lg-3 col-md-6 col-12">
+                <!-- Start Single Service -->
+                <div class="single-service">
+                    <i class="ti-tag"></i>
+                    <h4>Best Price</h4>
+                    <p>Guaranteed price</p>
+                </div>
+                <!-- End Single Service -->
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Shop Services Area -->
+
+<!-- Start Shop Newsletter  -->
+<section class="shop-newsletter section">
+    <div class="container">
+        <div class="inner-top">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2 col-12">
+                    <!-- Start Newsletter Inner -->
+                    <div class="inner">
+                        <h4>Newsletter</h4>
+                        <p> Subscribe to our newsletter and get <span>10%</span> off your first purchase</p>
+                        <form action="#" method="get" target="_blank" class="newsletter-inner">
+                            <input name="EMAIL" placeholder="Your email address" required="" type="email">
+                            <button class="btn">Subscribe</button>
+                        </form>
+                    </div>
+                    <!-- End Newsletter Inner -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Shop Newsletter -->
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .checkout .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .checkout input[type="text"],
+    .checkout input[type="email"],
+    .checkout input[type="number"],
+    .checkout select {
+        width: 100%;
+        height: 45px;
+        padding: 0 20px;
+        border-radius: 0px;
+        color: #333;
+        border: 1px solid #e6e6e6;
+    }
+    
+    .checkout select {
+        width: 100%;
+    }
+    
+    .checkout label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+    }
+    
+    .checkout label span {
+        color: red;
+        margin-left: 2px;
+    }
+    
+    .checkout-form h2 {
+        font-size: 25px;
+        color: #333;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    
+    .checkout-form p {
+        font-size: 15px;
+        margin-bottom: 20px;
+        color: #888;
+    }
+    
+    .order-details {
+        background: #f8f8f8;
+        padding: 30px;
+    }
+    
+    .order-details h2 {
+        font-size: 16px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #e6e6e6;
+        padding-bottom: 10px;
+        text-transform: uppercase;
+    }
+    
+    .order-details .content ul li {
+        border-bottom: 1px solid #e6e6e6;
+        padding: 10px 0;
+        font-size: 15px;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .order-details .content ul li.last {
+        border-bottom: 0;
+        padding-bottom: 0;
+        font-weight: 700;
+    }
+    
+    .single-widget.payement img {
+        max-width: 100%;
+    }
+    
+    .checkout-btn {
+        background-color: #333;
+        color: #fff;
+        border-radius: 0;
+        width: 100%;
+        text-transform: uppercase;
+        font-weight: 600;
+        height: 45px;
+        transition: all 0.4s ease;
+    }
+    
+    .checkout-btn:hover {
+        background-color: #F7941D;
+        color: #fff;
+    }
+    
+    .single-widget {
+        margin-bottom: 25px;
+    }
+    
+    .shipping span {
+        float: right;
+    }
+
+    /* Additional styles to match Laravel exactly */
+    .text-danger {
+        color: #dc3545!important;
+        font-size: 13px;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .checkbox input[type=radio] {
+        margin-right: 5px;
+    }
+
+    .checkbox label {
+        display: inline;
+        font-weight: normal;
+    }
+
+    .shop.checkout {
+        padding: 70px 0;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

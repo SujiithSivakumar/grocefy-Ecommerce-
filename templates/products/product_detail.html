@@ -1,0 +1,1225 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - Grocefy{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="bread-inner">
+                    <ul class="bread-list">
+                        <li><a href="{% url 'core:home' %}">Home<i class="ti-arrow-right"></i></a></li>
+                        <li class="active"><a href="">Shop Details</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumbs -->
+        
+<!-- Shop Single -->
+<section class="shop single section">
+    <div class="container">
+        <div class="row"> 
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-lg-6 col-12">
+                        <!-- Product Slider -->
+                        <div class="product-gallery">
+                            <!-- Images slider -->
+                            <div class="flexslider-thumbnails">
+                                <ul class="slides">
+                                    <li data-thumb="{{ product.image.url }}" rel="adjustX:10, adjustY:">
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                    </li>
+                                    {% if product.images.all %}
+                                        {% for image in product.images.all %}
+                                        <li data-thumb="{{ image.image.url }}" rel="adjustX:10, adjustY:">
+                                            <img src="{{ image.image.url }}" alt="{{ product.name }}">
+                                        </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            <!-- End Images slider -->
+                        </div>
+                        <!-- End Product slider -->
+                    </div>
+                    <div class="col-lg-6 col-12">
+                        <div class="product-des">
+                            <!-- Description -->
+                            <div class="short">
+                                <h4>{{ product.name }}</h4>
+                                <div class="rating-main">
+                                    <ul class="rating">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= avg_rating|floatformat:"0" %}
+                                                <li><i class="fa fa-star"></i></li>
+                                            {% else %}
+                                                <li><i class="fa fa-star-o"></i></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                    <a href="#reviews" class="total-review">({{ review_count }}) Review</a>
+                                </div>
+                                <p class="price">
+                                    {% if product.discount_price %}
+                                        <span class="discount">₹{{ product.discount_price }}</span>
+                                        <s>₹{{ product.price }}</s>
+                                    {% else %}
+                                        <span class="discount">₹{{ product.price }}</span>
+                                    {% endif %}
+                                </p>
+                                <p class="description">{{ product.description|truncatewords:30 }}</p>
+                            </div>
+                            <!--/ End Description -->
+                            
+                            <!-- Size -->
+                            {% if product.size %}
+                            <div class="size mt-4">
+                                <h4>Size</h4>
+                                <ul>
+                                    {% for size in product.size.split %}
+                                    <li><a href="#" class="one">{{ size }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            <!--/ End Size -->
+                            
+                            <!-- Product Buy -->
+                            <div class="product-buy">
+                                <form action="{% url 'cart:cart_add' product.id %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="quantity">
+                                        <h6>Quantity :</h6>
+                                        <!-- Input Order - NEW STYLE -->
+                                        <div class="quantity-counter" style="display: flex; align-items: center; margin-top: 10px;">
+                                            <button type="button" class="quantity-btn minus" style="width: 40px; height: 40px; border: 1px solid #ddd; background: #f7f7f7; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; border-radius: 4px 0 0 4px;">−</button>
+                                            <input type="text" name="quantity" value="1" class="quantity-input" style="width: 60px; height: 40px; border: 1px solid #ddd; border-left: none; border-right: none; text-align: center; font-size: 16px; background: #fff; color: #333; padding: 5px;">
+                                            <button type="button" class="quantity-btn plus" style="width: 40px; height: 40px; border: 1px solid #ddd; background: #f7f7f7; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; border-radius: 0 4px 4px 0;">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="add-to-cart mt-4">
+                                        <button type="submit" class="btn">Add to cart</button>
+                                        {% if is_in_wishlist %}
+                                            <a href="{% url 'products:remove_from_wishlist' product.id %}" class="btn min"><i class="ti-heart"></i></a>
+                                        {% else %}
+                                            <a href="{% url 'products:add_to_wishlist' product.id %}" class="btn min"><i class="ti-heart"></i></a>
+                                        {% endif %}
+                                    </div>
+                                    <input type="hidden" name="slug" value="{{ product.slug }}">
+                                </form>
+                                <p class="cat">Category :<a href="{% url 'products:category' product.category.slug %}">{{ product.category.name }}</a></p>
+                                {% if product.category.parent %}
+                                <p class="cat mt-1">Parent Category :<a href="{% url 'products:category' product.category.parent.slug %}">{{ product.category.parent.name }}</a></p>
+                                {% endif %}
+                                <p class="availability">Stock : 
+                                    {% if product.stock > 0 %}
+                                        <span class="badge badge-success">{{ product.stock }}</span>
+                                    {% else %} 
+                                        <span class="badge badge-danger">{{ product.stock }}</span>  
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <!--/ End Product Buy -->
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="product-info">
+                            <div class="nav-main">
+                                <!-- Tab Nav -->
+                                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                    <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#description" role="tab">Description</a></li>
+                                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#reviews" role="tab">Reviews</a></li>
+                                </ul>
+                                <!--/ End Tab Nav -->
+                            </div>
+                            <div class="tab-content" id="myTabContent">
+                                <!-- Description Tab -->
+                                <div class="tab-pane fade show active" id="description" role="tabpanel">
+                                    <div class="tab-single">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="single-des">
+                                                    <p>{{ product.description|safe }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--/ End Description Tab -->
+                                
+                                <!-- Reviews Tab -->
+                                <div class="tab-pane fade" id="reviews" role="tabpanel">
+                                    <div class="tab-single review-panel">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                
+                                                <!-- Review -->
+                                                <div class="comment-review">
+                                                    <div class="add-review">
+                                                        <h5>Add A Review</h5>
+                                                        <p>Your email address will not be published. Required fields are marked</p>
+                                                    </div>
+                                                    <h4>Your Rating <span class="text-danger">*</span></h4>
+                                                    <div class="review-inner">
+                                                            <!-- Form -->
+                                                    {% if user.is_authenticated %}
+                                                    <form class="form" method="post" action="{% url 'products:add_review' product.id %}">
+                                                        {% csrf_token %}
+                                                        <div class="row">
+                                                            <div class="col-lg-12 col-12">
+                                                                <div class="rating_box">
+                                                                    <div class="star-rating">
+                                                                        <div class="star-rating__wrap">
+                                                                        <input class="star-rating__input" id="star-rating-5" type="radio" name="rating" value="5">
+                                                                        <label class="star-rating__ico fa fa-star-o" for="star-rating-5" title="5 out of 5 stars"></label>
+                                                                        <input class="star-rating__input" id="star-rating-4" type="radio" name="rating" value="4">
+                                                                        <label class="star-rating__ico fa fa-star-o" for="star-rating-4" title="4 out of 5 stars"></label>
+                                                                        <input class="star-rating__input" id="star-rating-3" type="radio" name="rating" value="3">
+                                                                        <label class="star-rating__ico fa fa-star-o" for="star-rating-3" title="3 out of 5 stars"></label>
+                                                                        <input class="star-rating__input" id="star-rating-2" type="radio" name="rating" value="2">
+                                                                        <label class="star-rating__ico fa fa-star-o" for="star-rating-2" title="2 out of 5 stars"></label>
+                                                                        <input class="star-rating__input" id="star-rating-1" type="radio" name="rating" value="1">
+                                                                        <label class="star-rating__ico fa fa-star-o" for="star-rating-1" title="1 out of 5 stars"></label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-12 col-12">
+                                                                <div class="form-group">
+                                                                    <label>Write a review</label>
+                                                                    <textarea name="review" rows="6" placeholder="" ></textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-12 col-12">
+                                                                <div class="form-group button5">	
+                                                                    <button type="submit" class="btn">Submit</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                    {% else %}
+                                                    <p class="text-center p-5">
+                                                        You need to <a href="{% url 'accounts:login' %}?next={{ request.path }}" style="color:rgb(54, 54, 204)">Login</a> OR <a style="color:blue" href="{% url 'accounts:register' %}">Register</a>
+                                                    </p>
+                                                    <!--/ End Form -->
+                                                    {% endif %}
+                                                    </div>
+                                                </div>
+                                            
+                                                <div class="ratting-main">
+                                                    <div class="avg-ratting">
+                                                        <h4>{{ avg_rating|floatformat:1 }} <span>(Overall)</span></h4>
+                                                        <span>Based on {{ review_count }} Comments</span>
+                                                    </div>
+                                                    {% for review in reviews %}
+                                                    <!-- Single Rating -->
+                                                    <div class="single-rating">
+                                                        <div class="rating-author">
+                                                            {% if review.user.profile.photo %}
+                                                            <img src="{{ review.user.profile.photo.url }}" alt="{{ review.user.username }}">
+                                                            {% else %} 
+                                                            <img src="{% static 'backend/img/avatar.png' %}" alt="Profile.jpg">
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="rating-des">
+                                                            <h6>{{ review.user.get_full_name|default:review.user.username }}</h6>
+                                                            <div class="ratings">
+                                                                <ul class="rating">
+                                                                    {% for i in "12345" %}
+                                                                        {% if forloop.counter <= review.rating %}
+                                                                            <li><i class="fa fa-star"></i></li>
+                                                                        {% else %} 
+                                                                            <li><i class="fa fa-star-o"></i></li>
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                </ul>
+                                                                <div class="rate-count">(<span>{{ review.rating }}</span>)</div>
+                                                            </div>
+                                                            <p>{{ review.review }}</p>
+                                                        </div>
+                                                    </div>
+                                                    <!--/ End Single Rating -->
+                                                    {% endfor %}
+                                                </div>
+                                                
+                                                <!--/ End Review -->
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--/ End Reviews Tab -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!--/ End Shop Single -->
+
+<!-- Start Most Popular -->
+{% if related_products %}
+<div class="product-area most-popular related-product section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="section-title">
+                    <h2>Related Products</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="owl-carousel popular-slider">
+                    {% for product in related_products %}
+                    <!-- Start Single Product -->
+                    <div class="single-product">
+                        <div class="product-img">
+                            <a href="{% url 'products:product_detail' product.slug %}">
+                                <img class="default-img" src="{{ product.image.url }}" alt="{{ product.name }}">
+                                <img class="hover-img" src="{{ product.image.url }}" alt="{{ product.name }}">
+                                {% if product.discount_price %}
+                                <span class="price-dec">{{ product.get_discount_percentage }} % Off</span>
+                                {% endif %}
+                            </a>
+                            <div class="button-head">
+                                <div class="product-action">
+                                    <a data-toggle="modal" data-target="#quickViewModal" data-product-id="{{ product.id }}" title="Quick View" href="#"><i class="ti-eye"></i><span>Quick Shop</span></a>
+                                    <a title="Wishlist" href="{% url 'products:add_to_wishlist' product.id %}"><i class="ti-heart"></i><span>Add to Wishlist</span></a>
+                                    <a title="Compare" href="#"><i class="ti-bar-chart-alt"></i><span>Add to Compare</span></a>
+                                </div>
+                                <div class="product-action-2">
+                                    <a title="Add to cart" href="{% url 'cart:cart_add' product.id %}">Add to cart</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3><a href="{% url 'products:product_detail' product.slug %}">{{ product.name }}</a></h3>
+                            <div class="product-price">
+                                {% if product.discount_price %}
+                                    <span class="old">₹{{ product.price }}</span>
+                                    <span>₹{{ product.discount_price }}</span>
+                                {% else %}
+                                    <span>₹{{ product.price }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Single Product -->
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<!-- End Most Popular Area -->
+
+<!-- Modal -->
+<div class="modal fade" id="quickViewModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span class="ti-close" aria-hidden="true"></span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row no-gutters">
+                    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                        <!-- Product Slider -->
+                        <div class="product-gallery">
+                            <div class="quickview-slider-active">
+                                <div class="single-slider">
+                                    <img src="" alt="Product image" id="quick-view-image">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Product slider -->
+                    </div>
+                    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                        <div class="quickview-content">
+                            <h2 id="quick-view-title"></h2>
+                            <div class="quickview-ratting-review">
+                                <div class="quickview-ratting-wrap">
+                                    <div class="quickview-ratting" id="quick-view-rating">
+                                        <!-- Stars will be added dynamically -->
+                                    </div>
+                                    <a href="#" id="quick-view-review-count"></a>
+                                </div>
+                                <div class="quickview-stock">
+                                    <span id="quick-view-stock-status"></span>
+                                </div>
+                            </div>
+                            <h3 id="quick-view-price"></h3>
+                            <div class="quickview-peragraph">
+                                <p id="quick-view-description"></p>
+                            </div>
+                            <div class="quantity">
+                                <!-- Input Order -->
+                                <div class="input-group">
+                                    <div class="button minus">
+                                        <button type="button" class="btn btn-primary btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
+                                            <i class="ti-minus"></i>
+                                        </button>
+                                    </div>
+                                    <input type="text" name="quant[1]" class="input-number" data-min="1" data-max="1000" value="1" style="width: 70px !important; text-align: center; color: black !important; background: white !important; display: block !important; font-size: 16px !important; height: 40px !important; border: 1px solid #ccc !important; padding: 0 5px !important;">
+                                    <div class="button plus">
+                                        <button type="button" class="btn btn-primary btn-number" data-type="plus" data-field="quant[1]">
+                                            <i class="ti-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!--/ End Input Order -->
+                            </div>
+                            <div class="add-to-cart">
+                                <a href="#" class="btn" id="quick-view-add-to-cart">Add to cart</a>
+                                <a href="#" class="btn min" id="quick-view-add-to-wishlist"><i class="ti-heart"></i></a>
+                            </div>
+                            <div class="default-social">
+                                <h4 class="share-now">Share:</h4>
+                                <ul>
+                                    <li><a class="facebook" href="#"><i class="fa fa-facebook"></i></a></li>
+                                    <li><a class="twitter" href="#"><i class="fa fa-twitter"></i></a></li>
+                                    <li><a class="youtube" href="#"><i class="fa fa-pinterest-p"></i></a></li>
+                                    <li><a class="dribbble" href="#"><i class="fa fa-google-plus"></i></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal end -->
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Breadcrumb Styling to match Laravel project */
+    .breadcrumbs {
+        background-color: #F6F7FB;
+        padding: 30px 0;
+        margin-bottom: 30px;
+    }
+    
+    .bread-inner {
+        text-align: left;
+    }
+    
+    .bread-list {
+        display: inline-block;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .bread-list li {
+        display: inline-block;
+        position: relative;
+    }
+    
+    .bread-list li a {
+        color: #333;
+        font-size: 14px;
+        font-weight: 500;
+        display: inline-block;
+        margin: 0 5px;
+    }
+    
+    .bread-list li a:hover {
+        color: #F7941D;
+    }
+    
+    .bread-list li.active a {
+        color: #F7941D;
+    }
+    
+    .bread-list li:first-child a {
+        margin-left: 0;
+    }
+    
+    .bread-list li i {
+        font-size: 9px;
+        font-weight: 600;
+        margin: 0 7px;
+        color: #333;
+    }
+
+    /* Original CSS from product detail page */
+    /* Rating */
+    .rating_box {
+        display: inline-flex;
+    }
+
+    .star-rating {
+        font-size: 0;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .star-rating__wrap {
+        display: inline-block;
+        font-size: 1rem;
+    }
+
+    .star-rating__wrap:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+    .star-rating__ico {
+        float: right;
+        padding-left: 2px;
+        cursor: pointer;
+        color: #F7941D;
+        font-size: 16px;
+        margin-top: 5px;
+    }
+
+    .star-rating__ico:last-child {
+        padding-left: 0;
+    }
+
+    .star-rating__input {
+        display: none;
+    }
+
+    .star-rating__ico:hover:before,
+    .star-rating__ico:hover ~ .star-rating__ico:before,
+    .star-rating__input:checked ~ .star-rating__ico:before {
+        content: "\F005";
+    }
+
+    /* Product Gallery Slider */
+    .flexslider-thumbnails {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .flexslider-thumbnails .slides {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .flexslider-thumbnails .slides li {
+        display: none;
+    }
+    
+    .flexslider-thumbnails .slides li:first-child {
+        display: block;
+    }
+    
+    .flexslider-thumbnails .slides img {
+        width: 100%;
+        display: block;
+    }
+
+    /* Product Description */
+    .product-des .short h4 {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+    
+    .product-des .rating-main {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .product-des .rating-main .rating {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        margin-right: 10px;
+    }
+    
+    .product-des .rating-main .rating li {
+        margin-right: 3px;
+    }
+    
+    .product-des .rating-main .rating li i {
+        color: #F7941D;
+    }
+    
+    .product-des .price {
+        margin: 15px 0;
+    }
+    
+    .product-des .price .discount {
+        font-size: 22px;
+        color: #F7941D;
+        font-weight: 600;
+        margin-right: 10px;
+    }
+    
+    .product-des .price s {
+        color: #999;
+        font-size: 16px;
+    }
+    
+    .product-des .description {
+        color: #555;
+        line-height: 1.8;
+        margin-bottom: 20px;
+    }
+    
+    /* Size */
+    .size h4 {
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+    
+    .size ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .size ul li {
+        display: inline-block;
+        margin-right: 10px;
+    }
+    
+    .size ul li a {
+        display: inline-block;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        color: #333;
+        border-radius: 3px;
+        font-size: 14px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .size ul li a:hover {
+        background: #f9f9f9;
+    }
+    
+    /* Product Buy */
+    .product-buy {
+        margin-top: 20px;
+    }
+    
+    .product-buy .quantity {
+        margin-bottom: 20px;
+    }
+    
+    .product-buy .quantity h6 {
+        margin-bottom: 10px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .product-buy .quantity .input-group {
+        width: 150px;
+        display: flex;
+        flex-direction: row;
+    }
+    
+    .product-buy .quantity .input-group .button {
+        background: #fff;
+        width: 40px;
+        display: inline-block;
+        text-align: center;
+        height: 40px;
+    }
+    
+    .product-buy .quantity .input-group .button.minus {
+        border-radius: 5px 0 0 5px;
+    }
+    
+    .product-buy .quantity .input-group .button.plus {
+        border-radius: 0 5px 5px 0;
+    }
+    
+    .product-buy .quantity .input-group .button button {
+        background: transparent;
+        width: 100%;
+        height: 100%;
+        border: 1px solid #ddd;
+        color: #333;
+        font-size: 12px;
+        cursor: pointer;
+    }
+    
+    .product-buy .quantity .input-group .input-number {
+        border: 1px solid #ddd;
+        border-radius: 0;
+        text-align: center;
+        width: 70px !important;
+        height: 40px;
+        line-height: 40px;
+        border-left: none;
+        border-right: none;
+        display: inline-block;
+        font-size: 14px;
+        background: #fff;
+        padding: 0 5px;
+        color: #333;
+        -moz-appearance: textfield;
+    }
+    
+    .product-buy .quantity .input-group .input-number::-webkit-outer-spin-button,
+    .product-buy .quantity .input-group .input-number::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    
+    .product-buy .add-to-cart .btn {
+        background: #F7941D;
+        color: #fff;
+        padding: 10px 25px;
+        border-radius: 3px;
+        font-weight: 500;
+    }
+    
+    .product-buy .add-to-cart .btn.min {
+        background: #fff;
+        color: #333;
+        border: 1px solid #ddd;
+        padding: 10px 15px;
+        margin-left: 10px;
+    }
+    
+    .product-buy .add-to-cart .btn.min:hover {
+        color: #F7941D;
+    }
+    
+    .product-buy .cat {
+        font-size: 14px;
+        margin-top: 15px;
+        color: #555;
+    }
+    
+    .product-buy .cat a {
+        color: #F7941D;
+    }
+    
+    .product-buy .availability {
+        font-size: 14px;
+        margin-top: 10px;
+        color: #555;
+    }
+    
+    /* Product Info Tabs */
+    .product-info {
+        margin-top: 50px;
+    }
+    
+    .product-info .nav-main {
+        margin-bottom: 20px;
+    }
+    
+    .product-info .nav-tabs {
+        border-bottom: 1px solid #eee;
+    }
+    
+    .product-info .nav-tabs .nav-item .nav-link {
+        border: none;
+        color: #555;
+        font-weight: 500;
+        padding: 10px 15px;
+    }
+    
+    .product-info .nav-tabs .nav-item .nav-link.active {
+        color: #F7941D;
+        background: transparent;
+        border-bottom: 2px solid #F7941D;
+    }
+    
+    .product-info .tab-content {
+        padding-top: 20px;
+    }
+    
+    .product-info .single-des p {
+        line-height: 1.8;
+        color: #555;
+    }
+    
+    /* Reviews */
+    .comment-review .add-review {
+        margin-bottom: 20px;
+    }
+    
+    .comment-review .add-review h5 {
+        font-size: 18px;
+        font-weight: 600;
+    }
+    
+    .comment-review h4 {
+        font-size: 16px;
+        font-weight: 500;
+        margin: 15px 0;
+    }
+    
+    .review-inner {
+        margin-top: 15px;
+    }
+    
+    .review-inner .form-group label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+    
+    .review-inner .form-group textarea {
+        width: 100%;
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 3px;
+    }
+    
+    .review-inner .form-group button {
+        background: #F7941D;
+        color: #fff;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 3px;
+        font-weight: 500;
+    }
+    
+    .ratting-main {
+        margin-top: 30px;
+    }
+    
+    .avg-ratting {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .avg-ratting h4 {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .avg-ratting h4 span {
+        font-size: 16px;
+        color: #666;
+        font-weight: 400;
+    }
+    
+    .single-rating {
+        display: flex;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .single-rating:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    
+    .rating-author {
+        margin-right: 15px;
+    }
+    
+    .rating-author img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 1px solid #eee;
+    }
+    
+    .rating-des {
+        flex: 1;
+    }
+    
+    .rating-des h6 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .rating-des .ratings {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .rating-des .ratings ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        margin-right: 10px;
+    }
+    
+    .rating-des .ratings ul li {
+        margin-right: 2px;
+    }
+    
+    .rating-des .ratings ul li i {
+        color: #F7941D;
+    }
+    
+    .rating-des .ratings .rate-count {
+        font-size: 14px;
+        color: #666;
+    }
+    
+    .rating-des p {
+        line-height: 1.7;
+        color: #555;
+    }
+
+    /* Related Products Slider */
+    .popular-slider .single-product {
+        margin: 10px;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .popular-slider .single-product .product-img {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .popular-slider .single-product .product-img img {
+        width: 100%;
+        transition: all 0.4s ease;
+    }
+    
+    .popular-slider .single-product .product-img .hover-img {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s ease;
+    }
+    
+    .popular-slider .single-product:hover .product-img .hover-img {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .popular-slider .single-product .product-img .price-dec {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: #F7941D;
+        color: #fff;
+        padding: 5px 10px;
+        font-size: 13px;
+        border-radius: 3px;
+    }
+    
+    .popular-slider .single-product .product-content {
+        padding: 15px;
+    }
+    
+    .popular-slider .single-product .product-content h3 {
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+    
+    .popular-slider .single-product .product-content h3 a {
+        color: #333;
+    }
+    
+    .popular-slider .single-product .product-content h3 a:hover {
+        color: #F7941D;
+    }
+    
+    .popular-slider .single-product .product-content .product-price {
+        margin: 0;
+    }
+    
+    .popular-slider .single-product .product-content .product-price span {
+        font-size: 16px;
+        font-weight: 600;
+        color: #F7941D;
+    }
+    
+    .popular-slider .single-product .product-content .product-price span.old {
+        text-decoration: line-through;
+        color: #999;
+        margin-right: 10px;
+        font-size: 14px;
+    }
+    
+    .popular-slider .single-product .button-head {
+        position: absolute;
+        bottom: -50px;
+        left: 0;
+        width: 100%;
+        transition: all 0.4s ease;
+        opacity: 0;
+        visibility: hidden;
+    }
+    
+    .popular-slider .single-product:hover .button-head {
+        bottom: 0;
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .popular-slider .single-product .button-head .product-action {
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        justify-content: center;
+        padding: 8px 0;
+    }
+    
+    .popular-slider .single-product .button-head .product-action a {
+        color: #fff;
+        margin: 0 5px;
+        position: relative;
+    }
+    
+    .popular-slider .single-product .button-head .product-action a span {
+        position: absolute;
+        left: 50%;
+        top: -30px;
+        transform: translateX(-50%);
+        background: #F7941D;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s ease;
+        white-space: nowrap;
+    }
+    
+    .popular-slider .single-product .button-head .product-action a span:after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: -5px;
+        transform: translateX(-50%);
+        border-top: 5px solid #F7941D;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+    }
+    
+    .popular-slider .single-product .button-head .product-action a:hover span {
+        opacity: 1;
+        visibility: visible;
+        top: -40px;
+    }
+    
+    .popular-slider .single-product .button-head .product-action-2 {
+        background: #F7941D;
+        text-align: center;
+        padding: 8px 0;
+    }
+    
+    .popular-slider .single-product .button-head .product-action-2 a {
+        color: #fff;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/custom/quantity-fix.js' %}"></script>
+<script>
+    $(document).ready(function() {
+        // New quantity counter implementation
+        $('.quantity-btn').on('click', function() {
+            var $button = $(this);
+            var $input = $button.parent().find('.quantity-input');
+            var oldValue = parseInt($input.val());
+            var newVal;
+
+            if ($button.hasClass('plus')) {
+                // Don't allow incrementing beyond max stock
+                var maxStock = {{ product.stock }};
+                newVal = (oldValue >= maxStock) ? maxStock : oldValue + 1;
+            } else {
+                // Don't allow decrementing below 1
+                newVal = (oldValue <= 1) ? 1 : oldValue - 1;
+            }
+
+            $input.val(newVal);
+            $input.trigger('change');
+        });
+
+        // FlexSlider initialization (if available)
+        if ($.fn.flexslider) {
+            $('.flexslider-thumbnails').flexslider({
+                animation: "slide",
+                controlNav: "thumbnails",
+            });
+        } else {
+            // Fallback for thumbnail gallery
+            $('.flexslider-thumbnails .slides li:first-child').show();
+        }
+        
+        // Quantity Buttons
+        $('.btn-number').on('click', function(e) {
+            e.preventDefault();
+            
+            var fieldName = $(this).attr('data-field');
+            var type = $(this).attr('data-type');
+            var input = $("input[name='" + fieldName + "']");
+            var currentVal = parseInt(input.val());
+            
+            if (!isNaN(currentVal)) {
+                if (type == 'minus') {
+                    var minValue = parseInt(input.attr('data-min'));
+                    if (!minValue) minValue = 1;
+                    
+                    if (currentVal > minValue) {
+                        input.val(currentVal - 1).change();
+                    }
+                    if (parseInt(input.val()) == minValue) {
+                        $(this).attr('disabled', true);
+                    }
+                } else if (type == 'plus') {
+                    var maxValue = parseInt(input.attr('data-max'));
+                    if (!maxValue) maxValue = 999;
+                    
+                    if (currentVal < maxValue) {
+                        input.val(currentVal + 1).change();
+                    }
+                    if (parseInt(input.val()) == maxValue) {
+                        $(this).attr('disabled', true);
+                    }
+                }
+            } else {
+                input.val(1);
+            }
+            
+            // Force input field to update immediately with current value
+            input.trigger("input");
+        });
+        
+        $('.input-number').focusin(function() {
+            $(this).data('oldValue', $(this).val());
+        });
+        
+        $('.input-number').on('change input', function() {
+            var minValue = parseInt($(this).attr('data-min'));
+            var maxValue = parseInt($(this).attr('data-max'));
+            if (!minValue) minValue = 1;
+            if (!maxValue) maxValue = 999;
+            var valueCurrent = parseInt($(this).val()) || 0;
+            
+            var name = $(this).attr('name');
+            if (valueCurrent >= minValue) {
+                $(".btn-number[data-type='minus'][data-field='" + name + "']").removeAttr('disabled');
+            } else {
+                $(this).val(minValue);
+            }
+            if (valueCurrent <= maxValue) {
+                $(".btn-number[data-type='plus'][data-field='" + name + "']").removeAttr('disabled');
+            } else {
+                $(this).val(maxValue);
+            }
+        });
+        
+        $(".input-number").keydown(function(e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                 // Allow: Ctrl+A
+                (e.keyCode == 65 && e.ctrlKey === true) ||
+                 // Allow: home, end, left, right
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                    return;
+            }
+            // Ensure that it's a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+        
+        // Make sure the input values are visible on page load
+        $('.input-number').trigger('input');
+        
+        // Related Products Slider
+        $('.popular-slider').owlCarousel({
+            items: 4,
+            autoplay: true,
+            autoplayTimeout: 5000,
+            smartSpeed: 500,
+            loop: true,
+            nav: true,
+            navText: ['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>'],
+            dots: false,
+            margin: 30,
+            responsive: {
+                0: {
+                    items: 1,
+                },
+                600: {
+                    items: 2,
+                },
+                1000: {
+                    items: 3,
+                },
+                1200: {
+                    items: 4,
+                }
+            }
+        });
+        
+        // Quick View Modal
+        $('#quickViewModal').on('show.bs.modal', function (event) {
+            const button = $(event.relatedTarget);
+            const productId = button.data('product-id');
+            const modal = $(this);
+            
+            // Here you would typically make an AJAX call to get product details
+            // For demo purposes, we'll just set some placeholder data
+            // In a real implementation, you'd fetch this data from the server
+            
+            // Example AJAX call (commented out):
+            /*
+            $.ajax({
+                url: '/products/quick-view/' + productId,
+                type: 'GET',
+                success: function(data) {
+                    modal.find('#quick-view-title').text(data.name);
+                    modal.find('#quick-view-image').attr('src', data.image);
+                    modal.find('#quick-view-price').html(data.price_html);
+                    modal.find('#quick-view-description').text(data.short_description);
+                    modal.find('#quick-view-add-to-cart').attr('href', data.cart_url);
+                    modal.find('#quick-view-add-to-wishlist').attr('href', data.wishlist_url);
+                    
+                    // Update rating stars
+                    let stars = '';
+                    for (let i = 1; i <= 5; i++) {
+                        if (i <= data.rating) {
+                            stars += '<i class="yellow fa fa-star"></i>';
+                        } else {
+                            stars += '<i class="fa fa-star"></i>';
+                        }
+                    }
+                    modal.find('#quick-view-rating').html(stars);
+                    modal.find('#quick-view-review-count').text('(' + data.review_count + ' customer review)');
+                    
+                    // Update stock status
+                    if (data.in_stock) {
+                        modal.find('#quick-view-stock-status').html('<i class="fa fa-check-circle-o"></i> in stock');
+                    } else {
+                        modal.find('#quick-view-stock-status').html('<i class="fa fa-times-circle-o"></i> out of stock');
+                    }
+                }
+            });
+            */
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}GROCEFY || Order Track Page{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<div class="breadcrumbs" style="background-color: #f8f8f8; padding: 0; margin: 0; border-bottom: 1px solid #eee;">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="bread-inner" style="padding: 25px 0;">
+                    <ul class="bread-list" style="margin: 0; padding: 0; list-style: none;">
+                        <li style="display: inline-block; position: relative; font-size: 16px; margin: 0;">
+                            <a href="{% url 'core:home' %}" style="color: #666; font-size: 16px; font-weight: 400; text-decoration: none;">Home</a>
+                            <span style="display: inline-block; margin: 0 8px; color: #666; font-size: 16px;">→</span>
+                        </li>
+                        <li class="active" style="display: inline-block; position: relative; font-size: 16px; margin: 0;">
+                            <a href="#" style="color: #F7941D; font-size: 16px; font-weight: 400; text-decoration: none;">Order Track</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumbs -->
+
+<section class="tracking_box_area section_gap py-5">
+    <div class="container">
+        <div class="tracking_box_inner">
+            <p>To track your order please enter your Order ID in the box below and press the "Track" button. This was given
+                to you on your receipt and in the confirmation email you should have received.</p>
+            
+            {% if messages %}
+            <div class="messages mb-4">
+                {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}" role="alert">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <form class="row tracking_form my-4" action="{% url 'orders:product_track_order' %}" method="post">
+                {% csrf_token %}
+                <div class="col-md-8 form-group">
+                    <input type="text" class="form-control p-2" name="order_number" placeholder="Enter your order number" required>
+                </div>
+                <div class="col-md-8 form-group">
+                    <button type="submit" class="btn submit_btn">Track Order</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,550 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}GROCEFY || Cart Page{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<div class="breadcrumbs" style="background-color: #f8f8f8; padding: 0; margin: 0; border-bottom: 1px solid #eee;">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="bread-inner" style="padding: 25px 0;">
+                    <ul class="bread-list" style="margin: 0; padding: 0; list-style: none;">
+                        <li style="display: inline-block; position: relative; font-size: 16px; margin: 0;">
+                            <a href="{% url 'core:home' %}" style="color: #666; font-size: 16px; font-weight: 400; text-decoration: none;">Home</a>
+                            <span style="display: inline-block; margin: 0 8px; color: #666; font-size: 16px;">→</span>
+                        </li>
+                        <li class="active" style="display: inline-block; position: relative; font-size: 16px; margin: 0;">
+                            <a href="javascript:void(0);" style="color: #F7941D; font-size: 16px; font-weight: 400; text-decoration: none;">Cart</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumbs -->
+
+<!-- Shopping Cart -->
+<div class="shopping-cart section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                {% if messages %}
+                <div class="messages mb-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Shopping Summery -->
+                <table class="table shopping-summery">
+                    <thead>
+                        <tr class="main-hading" style="background-color: #F7941D; color: #fff;">
+                            <th style="width: 40%; text-transform: uppercase;">PRODUCT</th>
+                            <th style="width: 15%; text-transform: uppercase;">NAME</th>
+                            <th class="text-center" style="width: 12%; text-transform: uppercase;">UNIT PRICE</th>
+                            <th class="text-center" style="width: 15%; text-transform: uppercase;">QUANTITY</th>
+                            <th class="text-center" style="width: 12%; text-transform: uppercase;">TOTAL</th>
+                            <th class="text-center" style="width: 6%;"><i class="ti-trash remove-icon"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart_item_list">
+                        <form action="{% url 'cart:cart_update' %}" method="POST">
+                            {% csrf_token %}
+                            {% if cart_items %}
+                                {% for item in cart_items %}
+                                <tr>
+                                    <td class="image" data-title="No" style="width: 40%;"><img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="height: 80px; object-fit: contain;"></td>
+                                    <td class="product-des" data-title="Description" style="width: 15%;">
+                                        <p class="product-name"><a href="{% url 'products:product_detail' item.product.slug %}">{{ item.product.name }}</a></p>
+                                        <p class="product-des">{{ item.product.short_description|truncatechars:30 }}</p>
+                                    </td>
+                                    <td class="price" data-title="Price" style="width: 12%; text-align: center;"><span>₹{{ item.price }}</span></td>
+                                    <td class="qty" data-title="Qty" style="width: 15%; text-align: center;">
+                                        <!-- New Style Input Order -->
+                                        <div class="quantity-counter" style="display: flex; align-items: center; justify-content: center; margin: 0 auto; width: 140px;">
+                                            <button type="button" class="quantity-btn minus" style="width: 40px; height: 40px; border: 1px solid #ddd; background: #f7f7f7; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; border-radius: 4px 0 0 4px;" data-type="minus" data-field="quant[{{ forloop.counter0 }}]">−</button>
+                                            <input type="text" name="quant[{{ forloop.counter0 }}]" class="quantity-input" value="{{ item.quantity }}" style="width: 60px; height: 40px; border: 1px solid #ddd; border-left: none; border-right: none; text-align: center; font-size: 16px; background: #fff; color: #333; padding: 5px;" data-min="1" data-max="100">
+                                            <input type="hidden" name="qty_id[]" value="{{ item.product.id }}">
+                                            <button type="button" class="quantity-btn plus" style="width: 40px; height: 40px; border: 1px solid #ddd; background: #f7f7f7; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; border-radius: 0 4px 4px 0;" data-type="plus" data-field="quant[{{ forloop.counter0 }}]">+</button>
+                                        </div>
+                                        <!--/ End Input Order -->
+                                    </td>
+                                    <td class="total-amount cart_single_price" data-title="Total" style="width: 12%; text-align: center;"><span class="money">₹{{ item.total_price }}</span></td>
+                                    <td class="action" data-title="Remove" style="width: 6%; text-align: center;"><a href="{% url 'cart:cart_remove' item.product.id %}"><i class="ti-trash remove-icon"></i></a></td>
+                                </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td class="float-right">
+                                        <button class="btn" type="submit" style="background-color: #333; color: #fff; font-weight: 600; border-radius: 3px;">Update Cart</button>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td class="text-center" colspan="6">
+                                        There are no items in your cart. <a href="{% url 'products:product_list' %}" style="color:blue;">Continue shopping</a>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </form>
+                    </tbody>
+                </table>
+                <!--/ End Shopping Summery -->
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <!-- Total Amount -->
+                <div class="total-amount">
+                    <div class="row">
+                        <div class="col-lg-8 col-md-5 col-12">
+                            <div class="left">
+                                <div class="coupon">
+                                    <form action="{% url 'cart:apply_coupon' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input name="code" placeholder="Enter Your Coupon">
+                                        <button class="btn">Apply</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-7 col-12">
+                            <div class="right">
+                                <ul>
+                                    <li class="order_subtotal" data-price="{% if cart %}{{ cart.get_total_price }}{% else %}0{% endif %}">Cart Subtotal<span>₹{% if cart %}{{ cart.get_total_price }}{% else %}0.00{% endif %}</span></li>
+                                    
+                                    {% if cart and cart.coupon %}
+                                    <li class="coupon_price" data-price="{{ cart.get_discount }}">You Save<span>₹{{ cart.get_discount }}</span></li>
+                                    {% endif %}
+                                    
+                                    {% if cart and cart.coupon %}
+                                        <li class="last" id="order_total_price">You Pay<span>₹{{ cart.get_total_price_after_discount }}</span></li>
+                                    {% else %}
+                                        <li class="last" id="order_total_price">You Pay<span>₹{% if cart %}{{ cart.get_total_price }}{% else %}0.00{% endif %}</span></li>
+                                    {% endif %}
+                                </ul>
+                                <div class="button5">
+                                    {% if request.user.is_authenticated %}
+                                    <a href="{% url 'orders:order_create' %}" class="btn" style="background-color: #F7941D; color: #fff; font-weight: bold; padding: 12px 25px; font-size: 16px;">Checkout</a>
+                                    {% else %}
+                                    <a href="{% url 'accounts:login' %}?next={% url 'orders:order_create' %}" class="btn" style="background-color: #F7941D; color: #fff; font-weight: bold; padding: 12px 25px; font-size: 16px;">Checkout</a>
+                                    {% endif %}
+                                    <a href="{% url 'products:product_list' %}" class="btn">Continue shopping</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--/ End Total Amount -->
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ End Shopping Cart -->
+
+<!-- Start Shop Services Area  -->
+<section class="shop-services section" style="margin-bottom: 50px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-6 col-12">
+                <!-- Start Single Service -->
+                <div class="single-service">
+                    <i class="ti-rocket"></i>
+                    <h4>Free shiping</h4>
+                    <p>Orders over $100</p>
+                </div>
+                <!-- End Single Service -->
+            </div>
+            <div class="col-lg-3 col-md-6 col-12">
+                <!-- Start Single Service -->
+                <div class="single-service">
+                    <i class="ti-reload"></i>
+                    <h4>Free Return</h4>
+                    <p>Within 30 days returns</p>
+                </div>
+                <!-- End Single Service -->
+            </div>
+            <div class="col-lg-3 col-md-6 col-12">
+                <!-- Start Single Service -->
+                <div class="single-service">
+                    <i class="ti-lock"></i>
+                    <h4>Secure Payment</h4>
+                    <p>100% secure payment</p>
+                </div>
+                <!-- End Single Service -->
+            </div>
+            <div class="col-lg-3 col-md-6 col-12">
+                <!-- Start Single Service -->
+                <div class="single-service">
+                    <i class="ti-tag"></i>
+                    <h4>Best Price</h4>
+                    <p>Guaranteed price</p>
+                </div>
+                <!-- End Single Service -->
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Shop Services Area -->
+
+<!-- Start Shop Newsletter -->
+<section class="shop-newsletter section" style="margin-top: 30px; margin-bottom: 50px;">
+    {% include 'partials/newsletter.html' %}
+</section>
+<!-- End Shop Newsletter -->
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    li.shipping {
+        display: inline-flex;
+        width: 100%;
+        font-size: 14px;
+    }
+    li.shipping .input-group-icon {
+        width: 100%;
+        margin-left: 10px;
+    }
+    .input-group-icon .icon {
+        position: absolute;
+        left: 20px;
+        top: 0;
+        line-height: 40px;
+        z-index: 3;
+    }
+    .form-select {
+        height: 30px;
+        width: 100%;
+    }
+    .form-select .nice-select {
+        border: none;
+        border-radius: 0px;
+        height: 40px;
+        background: #f6f6f6 !important;
+        padding-left: 45px;
+        padding-right: 40px;
+        width: 100%;
+    }
+    .list li {
+        margin-bottom: 0 !important;
+    }
+    .list li:hover {
+        background: #F7941D !important;
+        color: white !important;
+    }
+    .form-select .nice-select::after {
+        top: 14px;
+    }
+    
+    /* Cart table styles */
+    .shopping-summery th {
+        padding: 12px 15px;
+        font-weight: 600;
+    }
+    
+    .shopping-cart .table td {
+        vertical-align: middle;
+        border-top: 1px solid #eee;
+        padding: 15px;
+    }
+    
+    .shopping-summery thead {
+        background: #F7941D;
+    }
+    
+    .shopping-cart .btn {
+        border-radius: 0;
+        padding: 10px 20px;
+    }
+    
+    /* Make the product image column wider */
+    .shopping-summery .image img {
+        max-width: 120px;
+        border: 1px solid #f7f7f7;
+        border-radius: 5px;
+    }
+    
+    /* Adjust quantity input style */
+    .shopping-cart .input-group {
+        justify-content: center;
+    }
+    
+    /* Additional Cart table styles */
+    .shopping-summery {
+        border: 1px solid #e9e9e9;
+        box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.05);
+    }
+    
+    .shopping-cart .table td.image img {
+        max-width: 100px;
+        border: 1px solid #f7f7f7;
+        border-radius: 5px;
+        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.05);
+        padding: 5px;
+        background: #fff;
+    }
+    
+    .shopping-cart .table .product-name a {
+        font-weight: 600;
+        color: #282828;
+        transition: all 0.3s ease;
+    }
+    
+    .shopping-cart .table .product-name a:hover {
+        color: #F7941D;
+    }
+    
+    .shopping-cart .table .product-des {
+        color: #888;
+        font-size: 13px;
+    }
+    
+    .button5 {
+        margin-top: 20px;
+    }
+    
+    .button5 .btn {
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    
+    /* Improve the coupon input */
+    .coupon {
+        padding: 20px;
+        background: #f6f7fb;
+        border-radius: 5px;
+    }
+    
+    .coupon input {
+        height: 48px;
+        padding: 0 20px;
+        border: 1px solid #e6e6e6;
+        width: 240px;
+        border-radius: 0;
+        margin-right: 10px;
+    }
+    
+    .coupon button {
+        background: #F7941D;
+        color: #fff;
+        border: none;
+    }
+    
+    /* Right side totals */
+    .right ul li {
+        padding: 10px 0;
+        border-bottom: 1px solid #ebebeb;
+        font-size: 15px;
+    }
+    
+    .right ul li.last {
+        border: none;
+        font-weight: 600;
+        font-size: 16px;
+    }
+    
+    .right ul li span {
+        float: right;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/nice-select/jquery.nice-select.min.js' %}"></script>
+<script src="{% static 'js/select2/select2.min.js' %}"></script>
+<script>
+    $(document).ready(function() { 
+        $("select.select2").select2(); 
+    });
+    $('select.nice-select').niceSelect();
+</script>
+<script>
+    $(document).ready(function(){
+        // Store the original prices and initial totals for each item
+        var itemPrices = [];
+        var itemInitialTotals = [];
+        
+        // Initialize the item prices and totals on page load
+        $('.price').each(function(index) {
+            // Get the price without the currency symbol (₹)
+            var price = $(this).find('span').text().replace('₹', '').trim();
+            itemPrices[index] = isNaN(parseFloat(price)) ? 0 : parseFloat(price);
+            
+            // Get the initial total price from the server-rendered HTML
+            var $row = $(this).closest('tr');
+            var totalText = $row.find('.total-amount .money').text().replace('₹', '').trim();
+            itemInitialTotals[index] = totalText;
+        });
+        
+        // Debug log
+        console.log("Item prices loaded:", itemPrices);
+        console.log("Initial totals loaded:", itemInitialTotals);
+        
+        // Function to update the total price for a single item
+        function updateItemTotal(inputElement) {
+            var $input = $(inputElement);
+            var $row = $input.closest('tr');
+            // Get the correct index based on the row, not the global index
+            var rowIndex = $('#cart_item_list tr').index($row);
+            var quantity = parseInt($input.val());
+            var unitPrice = itemPrices[rowIndex];
+            
+            console.log("Updating item", rowIndex, "qty:", quantity, "unit price:", unitPrice);
+            
+            // If unit price is valid, calculate the new total
+            if (!isNaN(unitPrice) && unitPrice > 0) {
+                var newTotal = (unitPrice * quantity).toFixed(2);
+                
+                // Find the total amount cell within the SAME row
+                var $totalCell = $row.find('.total-amount');
+                $totalCell.html('<span class="money">₹' + newTotal + '</span>');
+                console.log("Updated total for item", rowIndex, "to", newTotal);
+            } else {
+                // Use the initial total from the server if available
+                var initialTotal = itemInitialTotals[rowIndex];
+                if (initialTotal && !isNaN(parseFloat(initialTotal))) {
+                    // If we have an initial total, try to back-calculate the unit price
+                    var initialQuantity = parseInt($input.attr('value')) || 1;
+                    unitPrice = parseFloat(initialTotal) / initialQuantity;
+                    itemPrices[rowIndex] = unitPrice; // Update our stored price
+                    
+                    // Now use this unit price to calculate the new total
+                    var newTotal = (unitPrice * quantity).toFixed(2);
+                    var $totalCell = $row.find('.total-amount');
+                    $totalCell.html('<span class="money">₹' + newTotal + '</span>');
+                    console.log("Used back-calculation for item", rowIndex, "new unit price:", unitPrice);
+                }
+            }
+            
+            // Update the cart subtotal
+            updateCartTotals();
+        }
+        
+        // Function to recalculate and update the cart totals
+        function updateCartTotals() {
+            var subtotal = 0;
+            
+            // Calculate the new cart subtotal
+            $('.cart_single_price').each(function() {
+                var itemTotal = $(this).find('.money').text().replace('₹', '').trim();
+                if (!isNaN(parseFloat(itemTotal))) {
+                    subtotal += parseFloat(itemTotal);
+                }
+            });
+            
+            console.log("Cart subtotal calculated:", subtotal);
+            
+            // Update the displayed subtotal
+            $('.order_subtotal span').text('₹' + subtotal.toFixed(2));
+            
+            // Check if there's a coupon discount
+            var couponElement = $('.coupon_price');
+            if (couponElement.length > 0) {
+                var discount = parseFloat(couponElement.data('price'));
+                if (!isNaN(discount)) {
+                    var finalTotal = subtotal - discount;
+                    $('#order_total_price span').text('₹' + finalTotal.toFixed(2));
+                } else {
+                    $('#order_total_price span').text('₹' + subtotal.toFixed(2));
+                }
+            } else {
+                // No coupon, so subtotal = total
+                $('#order_total_price span').text('₹' + subtotal.toFixed(2));
+            }
+        }
+
+        // NEW: Quantity counter implementation for the new style
+        $('.quantity-btn').on('click', function() {
+            var $button = $(this);
+            var $input = $button.parent().find('.quantity-input');
+            var fieldName = $button.attr('data-field');
+            var type = $button.attr('data-type');
+            var currentVal = parseInt($input.val());
+            
+            if (!isNaN(currentVal)) {
+                if (type === 'minus') {
+                    var minValue = parseInt($input.attr('data-min')) || 1;
+                    if (currentVal > minValue) {
+                        $input.val(currentVal - 1);
+                        $input.trigger('change');
+                    }
+                    if (parseInt($input.val()) === minValue) {
+                        $button.attr('disabled', true);
+                    }
+                    // Enable the plus button
+                    var plusButton = $button.parent().find(".quantity-btn[data-type='plus']");
+                    plusButton.attr('disabled', false);
+                } else if (type === 'plus') {
+                    var maxValue = parseInt($input.attr('data-max')) || 100;
+                    if (currentVal < maxValue) {
+                        $input.val(currentVal + 1);
+                        $input.trigger('change');
+                    }
+                    if (parseInt($input.val()) === maxValue) {
+                        $button.attr('disabled', true);
+                    }
+                    // Enable the minus button
+                    var minusButton = $button.parent().find(".quantity-btn[data-type='minus']");
+                    minusButton.attr('disabled', false);
+                }
+                
+                // Update the price display after changing quantity
+                updateItemTotal($input);
+            } else {
+                $input.val(1);
+                updateItemTotal($input);
+            }
+        });
+        
+        // Initialize the quantity inputs
+        $('.quantity-input').on('change', function() {
+            var minValue = parseInt($(this).attr('data-min')) || 1;
+            var maxValue = parseInt($(this).attr('data-max')) || 100;
+            var valueCurrent = parseInt($(this).val()) || 0;
+            var quantityCounter = $(this).closest('.quantity-counter');
+            
+            if (valueCurrent >= minValue) {
+                quantityCounter.find(".quantity-btn[data-type='minus']").attr('disabled', false);
+            } else {
+                $(this).val(minValue);
+                quantityCounter.find(".quantity-btn[data-type='minus']").attr('disabled', true);
+            }
+            
+            if (valueCurrent <= maxValue) {
+                quantityCounter.find(".quantity-btn[data-type='plus']").attr('disabled', false);
+            } else {
+                $(this).val(maxValue);
+                quantityCounter.find(".quantity-btn[data-type='plus']").attr('disabled', true);
+            }
+            
+            // Update the price display when quantity changes manually
+            updateItemTotal(this);
+        });
+        
+        // Also handle direct typing in the quantity field
+        $('.quantity-input').on('input', function() {
+            updateItemTotal(this);
+        });
+        
+        // Initialize the total calculations on page load
+        $('.quantity-input').each(function() {
+            updateItemTotal(this);
+        });
+    });
+</script>
+{% endblock %}

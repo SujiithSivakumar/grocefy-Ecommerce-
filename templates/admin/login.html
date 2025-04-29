@@ -1,0 +1,55 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block extrastyle %}
+<link href="{% static 'backend/css/sb-admin-2.min.css' %}" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+{% endblock %}
+{% block bodyclass %}bg-gradient-primary{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-xl-5 col-lg-6 col-md-8">
+            <div class="card o-hidden border-0 shadow-lg my-5">
+                <div class="card-body p-0">
+                    <div class="p-5">
+                        <div class="text-center">
+                            <img src="{% static 'backend/images/logo.png' %}" alt="Logo" style="height:48px;">
+                            <h1 class="h4 text-gray-900 mb-4">Welcome to E-Shop Admin</h1>
+                        </div>
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <div>{{ error|escape }}</div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error|escape }}</div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <form method="post" class="user" id="login-form" action="">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required class="form-control form-control-user" placeholder="Username" id="id_username">
+                            </div>
+                            <div class="form-group">
+                                <input type="password" name="password" autocomplete="current-password" required class="form-control form-control-user" placeholder="Password" id="id_password">
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-user btn-block">Login</button>
+                        </form>
+                        <hr>
+                        <div class="text-center">
+                            <a class="small" href="/admin/password_reset/">Forgot Password?</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extrahead %}
+<link rel="icon" type="image/png" href="{% static 'backend/images/favicon.ico' %}"/>
+{% endblock %}

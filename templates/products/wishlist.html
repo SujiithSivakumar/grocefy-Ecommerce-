@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}GROCEFY || Wishlist Page{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<div class="breadcrumbs" style="background-color: #f8f8f8; padding: 0; margin: 0; border-bottom: 1px solid #eee;">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="bread-inner" style="padding: 25px 0;">
+                    <ul class="bread-list" style="margin: 0; padding: 0; list-style: none;">
+                        <li style="display: inline-block; position: relative; font-size: 16px; margin: 0;">
+                            <a href="{% url 'core:home' %}" style="color: #666; font-size: 16px; font-weight: 400; text-decoration: none;">Home</a>
+                            <span style="display: inline-block; margin: 0 8px; color: #666; font-size: 16px;">→</span>
+                        </li>
+                        <li class="active" style="display: inline-block; position: relative; font-size: 16px; margin: 0;">
+                            <a href="javascript:void(0);" style="color: #F7941D; font-size: 16px; font-weight: 400; text-decoration: none;">Wishlist</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumbs -->
+
+<!-- Shopping Cart -->
+<div class="shopping-cart section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                {% if messages %}
+                <div class="messages mb-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Shopping Summery -->
+                <table class="table shopping-summery">
+                    <thead>
+                        <tr class="main-hading" style="background-color: #F7941D; color: #fff;">
+                            <th style="width: 30%; text-transform: uppercase;">PRODUCT</th>
+                            <th style="width: 35%; text-transform: uppercase;">NAME</th>
+                            <th class="text-center" style="width: 15%; text-transform: uppercase;">PRICE</th>
+                            <th class="text-center" style="width: 15%; text-transform: uppercase;">ADD TO CART</th>
+                            <th class="text-center" style="width: 5%;"><i class="ti-trash remove-icon"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="wishlist_item_list">
+                        {% if wishlist_items %}
+                            {% for item in wishlist_items %}
+                            <tr>
+                                <td class="image" data-title="No" style="width: 30%;"><img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="max-width: 100px; border: 1px solid #f7f7f7; border-radius: 5px; box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.05); padding: 5px; background: #fff;"></td>
+                                <td class="product-des" data-title="Description" style="width: 35%;">
+                                    <p class="product-name"><a href="{% url 'products:product_detail' item.product.slug %}" style="font-weight: 600; color: #282828; transition: all 0.3s ease;">{{ item.product.name }}</a></p>
+                                    <p class="product-des" style="color: #888; font-size: 13px;">{{ item.product.description|truncatechars:100 }}</p>
+                                </td>
+                                <td class="price" data-title="Price" style="width: 15%; text-align: center;">
+                                    <span style="font-weight: 600;">₹{% if item.product.discount_price %}{{ item.product.discount_price }}{% else %}{{ item.product.price }}{% endif %}</span>
+                                </td>
+                                <td class="add-to-cart" style="width: 15%; text-align: center;">
+                                    <a href="{% url 'cart:cart_add' item.product.id %}" class="btn" style="background-color: #F7941D; color: #fff; padding: 8px 15px; text-transform: uppercase; font-weight: 600; font-size: 13px;">Add To Cart</a>
+                                </td>
+                                <td class="action" data-title="Remove" style="width: 5%; text-align: center;">
+                                    <a href="{% url 'products:remove_from_wishlist' item.product.id %}" style="color: #F7941D; font-size: 18px;"><i class="ti-trash remove-icon"></i></a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td class="text-center" colspan="5">
+                                    There are no items in your wishlist. <a href="{% url 'products:product_list' %}" style="color:#F7941D;">Continue shopping</a>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+                <!--/ End Shopping Summery -->
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ End Shopping Cart -->
+
+<!-- Start Shop Services Area  -->
+<section class="shop-services section" style="margin-bottom: 50px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-6 col-12">
+                <!-- Start Single Service -->
+                <div class="single-service">
+                    <i class="ti-rocket"></i>
+                    <h4>Free shiping</h4>
+                    <p>Orders over ₹100</p>
+                </div>
+                <!-- End Single Service -->
+            </div>
+            <div class="col-lg-3 col-md-6 col-12">
+                <!-- Start Single Service -->
+                <div class="single-service">
+                    <i class="ti-reload"></i>
+                    <h4>Free Return</h4>
+                    <p>Within 30 days returns</p>
+                </div>
+                <!-- End Single Service -->
+            </div>
+            <div class="col-lg-3 col-md-6 col-12">
+                <!-- Start Single Service -->
+                <div class="single-service">
+                    <i class="ti-lock"></i>
+                    <h4>Secure Payment</h4>
+                    <p>100% secure payment</p>
+                </div>
+                <!-- End Single Service -->
+            </div>
+            <div class="col-lg-3 col-md-6 col-12">
+                <!-- Start Single Service -->
+                <div class="single-service">
+                    <i class="ti-tag"></i>
+                    <h4>Best Price</h4>
+                    <p>Guaranteed price</p>
+                </div>
+                <!-- End Single Service -->
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Shop Services Area -->
+
+<!-- Start Shop Newsletter -->
+<section class="shop-newsletter section" style="margin-top: 30px; margin-bottom: 50px;">
+    {% include 'partials/newsletter.html' %}
+</section>
+<!-- End Shop Newsletter -->
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Shopping Summery */
+    .shopping-summery {
+        border: 1px solid #e9e9e9;
+        box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.05);
+    }
+
+    .shopping-cart .table th {
+        padding: 12px 15px;
+        font-weight: 600;
+        color: #fff;
+        text-transform: uppercase;
+    }
+    
+    .shopping-cart .table td {
+        vertical-align: middle;
+        border-top: 1px solid #eee;
+        padding: 15px;
+    }
+    
+    .shopping-cart .btn {
+        border-radius: 0;
+        padding: 10px 20px;
+    }
+    
+    /* Product image */
+    .shopping-cart .table td.image img {
+        max-width: 100px;
+        border: 1px solid #f7f7f7;
+        border-radius: 5px;
+        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.05);
+        padding: 5px;
+        background: #fff;
+    }
+    
+    /* Product name and description */
+    .shopping-cart .table .product-name a {
+        font-weight: 600;
+        color: #282828;
+        transition: all 0.3s ease;
+    }
+    
+    .shopping-cart .table .product-name a:hover {
+        color: #F7941D;
+    }
+    
+    .shopping-cart .table .product-des {
+        color: #888;
+        font-size: 13px;
+        max-width: 500px;
+    }
+    
+    /* "Add to cart" button */
+    .shopping-cart .add-to-cart .btn {
+        background-color: #F7941D;
+        color: #fff;
+        text-transform: uppercase;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 8px 15px;
+    }
+    
+    /* Remove icon */
+    .shopping-cart .action a {
+        color: #F7941D;
+        font-size: 18px;
+    }
+    
+    .shopping-cart .action a:hover {
+        color: #f44336;
+    }
+    
+    /* Empty wishlist message */
+    .shopping-summery tr td.text-center {
+        padding: 30px;
+        font-size: 16px;
+        color: #666;
+    }
+    
+    .shopping-summery tr td.text-center a {
+        color: #F7941D;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}

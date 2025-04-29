@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Orders - Grocefy{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="bread-inner">
+                    <ul class="bread-list">
+                        <li><a href="{% url 'home' %}">Home<i class="ti-arrow-right"></i></a></li>
+                        <li class="active"><a href="{% url 'accounts:user_orders' %}">My Orders</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumbs -->
+
+<!-- Orders Section -->
+<section class="shop-single section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-12">
+                <div class="shop-sidebar">
+                    <!-- Single Widget -->
+                    <div class="single-widget category">
+                        <h3 class="title">My Account</h3>
+                        <ul class="categor-list">
+                            <li><a href="{% url 'accounts:profile' %}">My Profile</a></li>
+                            <li class="active"><a href="{% url 'accounts:user_orders' %}">My Orders</a></li>
+                            <li><a href="{% url 'accounts:profile_edit' %}">Edit Profile</a></li>
+                            <li><a href="{% url 'accounts:password_change' %}">Change Password</a></li>
+                            <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
+                        </ul>
+                    </div>
+                    <!--/ End Single Widget -->
+                </div>
+            </div>
+            <div class="col-lg-8 col-12">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="mb-0">My Orders</h4>
+                            </div>
+                            <div class="card-body">
+                                {% if orders %}
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Order ID</th>
+                                                    <th>Date</th>
+                                                    <th>Status</th>
+                                                    <th>Total</th>
+                                                    <th>Payment Status</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for order in orders %}
+                                                <tr>
+                                                    <td>#{{ order.id }}</td>
+                                                    <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                                    <td>
+                                                        <span class="badge {% if order.status == 'pending' %}badge-warning{% elif order.status == 'processing' %}badge-info{% elif order.status == 'shipped' %}badge-primary{% elif order.status == 'delivered' %}badge-success{% elif order.status == 'cancelled' %}badge-danger{% endif %}">
+                                                            {{ order.get_status_display }}
+                                                        </span>
+                                                    </td>
+                                                    <td>${{ order.total_price }}</td>
+                                                    <td>
+                                                        <span class="badge {% if order.payment_status == 'paid' %}badge-success{% else %}badge-warning{% endif %}">
+                                                            {{ order.payment_status|title }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-sm btn-primary">View Details</a>
+                                                        {% if order.status == 'pending' %}
+                                                            <a href="{% url 'orders:order_cancel' order.id %}" class="btn btn-sm btn-danger ml-2"
+                                                               onclick="return confirm('Are you sure you want to cancel this order?')">
+                                                                Cancel Order
+                                                            </a>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <div class="text-center py-4">
+                                        <h5>No orders found</h5>
+                                        <p class="text-muted">You haven't placed any orders yet.</p>
+                                        <a href="{% url 'products:product_list' %}" class="btn btn-primary">Start Shopping</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Orders Section -->
+{% endblock %}

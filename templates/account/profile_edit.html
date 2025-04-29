@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile - Grocefy{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="bread-inner">
+                    <ul class="bread-list">
+                        <li><a href="{% url 'home' %}">Home<i class="ti-arrow-right"></i></a></li>
+                        <li><a href="{% url 'accounts:profile' %}">My Profile<i class="ti-arrow-right"></i></a></li>
+                        <li class="active"><a href="{% url 'accounts:profile_edit' %}">Edit Profile</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumbs -->
+
+<!-- Profile Edit Section -->
+<section class="shop-single section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-12">
+                <div class="shop-sidebar">
+                    <!-- Single Widget -->
+                    <div class="single-widget category">
+                        <h3 class="title">My Account</h3>
+                        <ul class="categor-list">
+                            <li><a href="{% url 'accounts:profile' %}">My Profile</a></li>
+                            <li><a href="{% url 'accounts:user_orders' %}">My Orders</a></li>
+                            <li class="active"><a href="{% url 'accounts:profile_edit' %}">Edit Profile</a></li>
+                            <li><a href="{% url 'accounts:password_change' %}">Change Password</a></li>
+                            <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
+                        </ul>
+                    </div>
+                    <!--/ End Single Widget -->
+                </div>
+            </div>
+            <div class="col-lg-8 col-12">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="mb-0">Edit Profile</h4>
+                            </div>
+                            <div class="card-body">
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        <div class="alert alert-{{ message.tags }}">
+                                            {{ message }}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+
+                                <form method="post" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        {% for field in form %}
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                                {{ field }}
+                                                {% if field.errors %}
+                                                    {% for error in field.errors %}
+                                                        <div class="invalid-feedback d-block">
+                                                            {{ error }}
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endif %}
+                                                {% if field.help_text %}
+                                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <div class="form-group text-center mt-4">
+                                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                                        <a href="{% url 'accounts:profile' %}" class="btn btn-secondary ml-2">Cancel</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Profile Edit Section -->
+{% endblock %}

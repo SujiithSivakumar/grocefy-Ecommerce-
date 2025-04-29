@@ -1,0 +1,100 @@
+/* Laravel-style Category Admin CSS */
+
+/* Table styling to match Laravel */
+.table-bordered {
+    border: 1px solid #e3e6f0;
+}
+
+.table-bordered td, .table-bordered th {
+    border: 1px solid #e3e6f0;
+}
+
+/* Card styling */
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.btn-primary:hover {
+    background-color: #2e59d9;
+    border-color: #2653d4;
+}
+
+/* Image preview styling */
+.image-preview {
+    max-width: 80px;
+    max-height: 50px;
+    border-radius: 4px;
+}
+
+/* Status badge styling */
+.badge-success {
+    color: #fff;
+    background-color: #1cc88a;
+}
+
+.badge-danger {
+    color: #fff;
+    background-color: #e74a3b;
+}
+
+/* Table header styling */
+#dataTable thead th {
+    font-weight: 600;
+    color: #5a5c69;
+    background-color: #f8f9fc;
+}
+
+/* Pagination styling to match Laravel */
+.pagination {
+    display: flex;
+    padding-left: 0;
+    list-style: none;
+    border-radius: 0.35rem;
+}
+
+.pagination .page-item .page-link {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: #4e73df;
+    background-color: #fff;
+    border: 1px solid #dddfeb;
+}
+
+.pagination .page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+/* Action buttons styling */
+.action-buttons a {
+    margin-right: 5px;
+}
+
+/* Search form styling */
+#searchbar {
+    border-radius: 4px;
+    border: 1px solid #d1d3e2;
+    padding: 0.375rem 0.75rem;
+}
+
+.search-form {
+    margin-bottom: 1rem;
+}
+
+/* Status toggle styling */
+.status-toggle .form-check-input {
+    width: 2rem;
+    height: 1rem;
+}

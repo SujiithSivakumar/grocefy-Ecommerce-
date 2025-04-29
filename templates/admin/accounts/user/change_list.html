@@ -1,0 +1,219 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block title %}GROCEFY || USERS{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    .user-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    .user-table th, .user-table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid #e3e6f0;
+    }
+    .user-table th {
+      background-color: #f8f9fc;
+      color: #4e73df;
+      font-weight: bold;
+      text-align: left;
+    }
+    .user-table tr:hover {
+      background-color: rgba(78, 115, 223, 0.05);
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25em 0.4em;
+      font-size: 75%;
+      font-weight: 700;
+      line-height: 1;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: baseline;
+      border-radius: 0.25rem;
+    }
+    .badge-success {
+      color: #fff;
+      background-color: #1cc88a;
+    }
+    .badge-warning {
+      color: #fff;
+      background-color: #f6c23e;
+    }
+    .btn-circle {
+      border-radius: 100%;
+      height: 2.5rem;
+      width: 2.5rem;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-circle.btn-sm {
+      height: 1.8rem;
+      width: 1.8rem;
+      font-size: 0.75rem;
+    }
+    .btn-primary {
+      color: #fff;
+      background-color: #4e73df;
+      border-color: #4e73df;
+    }
+    .btn-danger {
+      color: #fff;
+      background-color: #e74a3b;
+      border-color: #e74a3b;
+    }
+    .user-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .action-btns {
+      display: flex;
+      gap: 0.5rem;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <div class="module" id="changelist">
+    <div class="changelist-form-container">
+      
+      <div class="card shadow mb-4">
+        <!-- Card Header -->
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold text-primary">Users List</h6>
+          
+          {% if has_add_permission %}
+            {% url cl.opts|admin_urlname:'add' as add_url %}
+            <a href="{% add_preserved_filters add_url is_popup to_field %}" class="btn btn-primary btn-sm">
+              <i class="fas fa-plus"></i> Add User
+            </a>
+          {% endif %}
+        </div>
+        
+        <!-- Card Body -->
+        <div class="card-body">
+          {% block result_list %}
+            <!-- This is a simplified table that should display users -->
+            <table class="user-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Photo</th>
+                  <th>Join Date</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for user in cl.queryset %}
+                  <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}</td>
+                    <td>{{ user.email }}</td>
+                    <td class="text-center">
+                      {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" class="user-img" alt="{{ user.username }}">
+                      {% else %}
+                        <img src="{% static 'backend/img/avatar.png' %}" class="user-img" alt="avatar.png">
+                      {% endif %}
+                    </td>
+                    <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                    <td>
+                      {% if user.is_superuser %}
+                        Admin
+                      {% elif user.is_staff %}
+                        Staff
+                      {% else %}
+                        Customer
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if user.is_active %}
+                        <span class="badge badge-success">Active</span>
+                      {% else %}
+                        <span class="badge badge-warning">Inactive</span>
+                      {% endif %}
+                    </td>
+                    <td class="action-btns">
+                      <a href="{% url 'admin:accounts_user_change' user.id %}" class="btn btn-primary btn-sm btn-circle" title="Edit">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      {% url 'admin:accounts_user_delete' user.id as delete_url %}
+                      <a href="{{ delete_url }}" class="btn btn-danger btn-sm btn-circle" title="Delete">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="8">
+                      <div style="padding: 20px; text-align: center;">
+                        <p style="font-size: 16px; color: #858796;">No users found in the database.</p>
+                        <p>Click the "Add User" button to create your first user.</p>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% endblock %}
+        </div>
+      </div>
+      
+      <!-- Pagination -->
+      {% block pagination %}{% pagination cl %}{% endblock %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extrascript %}
+  {{ block.super }}
+  <script src="{% static 'backend/vendor/datatables/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'backend/vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#user-dataTable').DataTable({
+        "columnDefs": [
+          { "orderable": false, "targets": [3, 6, 7] } // Disable sorting for photo, status and action columns
+        ],
+        "paging": false
+      });
+      
+      // Delete confirmation with SweetAlert
+      $('.dltBtn').click(function(e) {
+        e.preventDefault();
+        var form = $(this).closest('form');
+        
+        swal({
+          title: "Are you sure?",
+          text: "Once deleted, you will not be able to recover this data!",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+            form.submit();
+          } else {
+            swal("Your data is safe!");
+          }
+        });
+      });
+    });
+  </script>
+{% endblock %}

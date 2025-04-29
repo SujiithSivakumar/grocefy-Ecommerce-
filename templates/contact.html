@@ -1,0 +1,414 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - Grocefy{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <ul class="breadcrumb-items">
+                    <li><a href="{% url 'core:home' %}">Home </a><i class="fa fa-chevron-right"></i></li>
+                    <li class="active">Contact</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumbs -->
+
+<!-- Start Contact -->
+<section id="contact-us" class="contact-us section">
+    <div class="container">
+        <div class="contact-head">
+            <div class="row">
+                <div class="col-lg-8 col-12">
+                    <div class="form-main">
+                        <div class="title">
+                            <h4>Get in touch</h4>
+                            <h3>Write Us A Message {% if user.is_authenticated %}{% else %}<span style="font-size:12px;" class="text-danger">[You Need To Login First]</span>{% endif %}</h3>
+                        </div>
+                        <form class="form-contact form contact_form" method="post" action="{% url 'core:contact_us' %}" id="contactForm" novalidate="novalidate">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group">
+                                        <label>Your Name<span>*</span></label>
+                                        <input name="name" id="name" type="text" placeholder="Enter your name">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group">
+                                        <label>Your Subjects<span>*</span></label>
+                                        <input name="subject" type="text" id="subject" placeholder="Enter Subject">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group">
+                                        <label>Your Email<span>*</span></label>
+                                        <input name="email" type="email" id="email" placeholder="Enter email address">
+                                    </div>	
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group">
+                                        <label>Your Phone<span>*</span></label>
+                                        <input id="phone" name="phone" type="number" placeholder="Enter your phone">
+                                    </div>	
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group message">
+                                        <label>Your Message<span>*</span></label>
+                                        <textarea name="message" id="message" cols="30" rows="9" placeholder="Enter Message"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group button">
+                                        <button type="submit" class="btn">Send Message</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-12">
+                    <div class="single-head">
+                        <div class="single-info">
+                            <div class="info-icon">
+                                <i class="fa fa-phone"></i>
+                            </div>
+                            <div class="info-content">
+                                <h4 class="title">Call us Now:</h4>
+                                <p>123456789</p>
+                            </div>
+                        </div>
+                        <div class="single-info">
+                            <div class="info-icon">
+                                <i class="fa fa-envelope-open"></i>
+                            </div>
+                            <div class="info-content">
+                                <h4 class="title">Email:</h4>
+                                <p><a href="mailto:{{ settings.email }}">{{ settings.email|default:"info@grocefy.com" }}</a></p>
+                            </div>
+                        </div>
+                        <div class="single-info">
+                            <div class="info-icon">
+                                <i class="fa fa-location-arrow"></i>
+                            </div>
+                            <div class="info-content">
+                                <h4 class="title">Our Address:</h4>
+                                <p>{{ settings.address|default:"123 Main Street, City, Country" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!--/ End Contact -->
+
+<!-- Map Section -->
+<div class="map-section">
+    <div id="myMap">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1583.5973420496857!2d78.44724173902001!3d10.964951916200546!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3baa4f96794c9101%3A0x3afd753b7ba40f77!2sMaligai%20kadai!5e0!3m2!1sen!2sin!4v1731870594911!5m2!1sen!2sin" 
+        width="100%" 
+        height="100%" 
+        frameborder="0" 
+        style="border:0;" 
+        loading="lazy" 
+        referrerpolicy="no-referrer-when-downgrade"
+        allowfullscreen="" 
+        aria-hidden="false" 
+        tabindex="0"></iframe>
+    </div>
+</div>
+<!--/ End Map Section -->
+
+<!-- Start Shop Newsletter -->
+{% include 'includes/newsletter.html' %}
+<!-- End Shop Newsletter -->
+
+<!--================Contact Success  =================-->
+<div class="modal fade" id="success" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-success">Thank you!</h2>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="text-success">Your message is successfully sent...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals error -->
+<div class="modal fade" id="error" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-warning">Sorry!</h2>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="text-warning">Something went wrong.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Breadcrumb styling to match Laravel version */
+    .breadcrumbs {
+        background-color: #f6f6f6;
+        padding: 15px 0;
+        margin-bottom: 40px;  /* Increased spacing */
+    }
+    
+    .breadcrumb-items {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .breadcrumb-items li {
+        font-size: 14px;
+        display: inline-block;
+    }
+    
+    .breadcrumb-items li a {
+        color: #333;
+        text-decoration: none;
+        padding-right: 5px;
+    }
+    
+    .breadcrumb-items li.active {
+        color: #F7941D;
+    }
+    
+    .breadcrumb-items li i {
+        font-size: 12px;
+        color: #777;
+        margin: 0 10px;
+    }
+
+    /* Section spacing improvements */
+    .contact-us.section {
+        padding: 50px 0;
+        margin-bottom: 50px;  /* Added spacing after contact section */
+    }
+    
+    .map-section {
+        width: 100%;
+        height: 400px;
+        margin-bottom: 90px;  /* Increased spacing after map */
+    }
+    
+    .shop-newsletter.section {
+        margin-top: 50px;  /* Increased top margin */
+        margin-bottom: 70px;  /* Increased spacing after newsletter */
+        padding: 60px 0;  /* Added padding inside newsletter section */
+        position: relative;  /* Ensure proper stacking context */
+        z-index: 1;  /* Prevent overlap issues */
+    }
+    
+    /* Contact info styling to match Laravel version */
+    .single-head {
+        padding: 20px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+        border-radius: 4px;
+    }
+    
+    .single-info {
+        display: flex;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .single-info:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    
+    .info-icon {
+        margin-right: 20px;
+    }
+    
+    .info-icon i {
+        color: #F7941D;
+        font-size: 24px;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        display: block;
+    }
+    
+    .info-content h4 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .info-content p {
+        color: #777;
+        margin: 0;
+    }
+    
+    .info-content p a {
+        color: #777;
+        text-decoration: none;
+    }
+    
+    .info-content p a:hover {
+        color: #F7941D;
+    }
+    
+    .modal-dialog .modal-content .modal-header {
+        position: initial;
+        padding: 10px 20px;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .modal-dialog .modal-content .modal-body {
+        height: 100px;
+        padding: 10px 20px;
+    }
+    
+    .modal-dialog .modal-content {
+        width: 50%;
+        border-radius: 0;
+        margin: auto;
+    }
+    
+    /* Form styling */
+    .form-main {
+        padding: 30px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        margin-bottom: 30px;
+    }
+    
+    .title h4 {
+        font-size: 16px;
+        color: #F7941D;
+        margin-bottom: 10px;
+    }
+    
+    .title h3 {
+        font-size: 22px;
+        margin-bottom: 25px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        border: 1px solid #ddd;
+        padding: 12px 15px;
+        border-radius: 4px;
+    }
+    
+    .form-group button {
+        background: #F7941D;
+        color: #fff;
+        padding: 13px 30px;
+        border: none;
+        border-radius: 4px;
+        text-transform: uppercase;
+        font-weight: 500;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/jquery.form.js' %}"></script>
+<script src="{% static 'js/jquery.validate.min.js' %}"></script>
+<script>
+$(document).ready(function() {
+    $('#contactForm').validate({
+        rules: {
+            name: {
+                required: true,
+                minlength: 2
+            },
+            subject: {
+                required: true,
+                minlength: 4
+            },
+            email: {
+                required: true,
+                email: true
+            },
+            phone: {
+                required: true,
+                minlength: 10
+            },
+            message: {
+                required: true,
+                minlength: 20
+            }
+        },
+        messages: {
+            name: {
+                required: "Please enter your name",
+                minlength: "Your name must consist of at least 2 characters"
+            },
+            subject: {
+                required: "Please enter subject",
+                minlength: "Your subject must consist of at least 4 characters"
+            },
+            email: {
+                required: "Please enter your email"
+            },
+            phone: {
+                required: "Please enter your phone number",
+                minlength: "Your phone number must be at least 10 characters long"
+            },
+            message: {
+                required: "Please enter your message",
+                minlength: "Your message must consist of at least 20 characters"
+            }
+        },
+        submitHandler: function(form) {
+            $.ajax({
+                type: "POST",
+                url: $(form).attr('action'),
+                data: $(form).serialize(),
+                success: function() {
+                    $('#success').modal('show');
+                    $(form)[0].reset();
+                },
+                error: function() {
+                    $('#error').modal('show');
+                }
+            });
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}

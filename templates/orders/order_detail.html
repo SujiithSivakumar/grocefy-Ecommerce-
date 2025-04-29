@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+
+{% block title %}Order #{{ order.id }} - Grocefy{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="bread-inner">
+                    <ul class="bread-list">
+                        <li><a href="{% url 'home' %}">Home<i class="ti-arrow-right"></i></a></li>
+                        <li><a href="{% url 'orders:order_list' %}">My Orders<i class="ti-arrow-right"></i></a></li>
+                        <li class="active"><a href="{% url 'orders:order_detail' order.id %}">Order #{{ order.id }}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumbs -->
+
+<!-- Order Details -->
+<div class="card">
+  <h5 class="card-header">Order</h5>
+  <div class="card-body">
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+            <th>S.N.</th>
+            <th>Order No.</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Quantity</th>
+            <th>Charge</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.id }}</td>
+            <td>{{ order.first_name }} {{ order.last_name }}</td>
+            <td>{{ order.email }}</td>
+            <td>{{ order.get_total_quantity }}</td>
+            <td>₹{{ order.shipping_cost }}</td>
+            <td>₹{{ order.total_price }}</td>
+            <td>
+                {% if order.status == 'pending' %}
+                  <span class="badge badge-primary">{{ order.get_status_display }}</span>
+                {% elif order.status == 'processing' %}
+                  <span class="badge badge-warning">{{ order.get_status_display }}</span>
+                {% elif order.status == 'delivered' %}
+                  <span class="badge badge-success">{{ order.get_status_display }}</span>
+                {% else %}
+                  <span class="badge badge-danger">{{ order.get_status_display }}</span>
+                {% endif %}
+            </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <section class="confirmation_part section_padding">
+      <div class="order_boxes">
+        <div class="row">
+          <div class="col-lg-6 col-lx-4">
+            <div class="order-info">
+              <h4 class="text-center pb-4">ORDER INFORMATION</h4>
+              <table class="table">
+                    <tr class="">
+                        <td>Order Number</td>
+                        <td> : #{{ order.id }}</td>
+                    </tr>
+                    <tr>
+                        <td>Order Date</td>
+                        <td> : {{ order.created_at|date:"D d M, Y" }} at {{ order.created_at|date:"g : i a" }} </td>
+                    </tr>
+                    <tr>
+                        <td>Quantity</td>
+                        <td> : {{ order.get_total_quantity }}</td>
+                    </tr>
+                    <tr>
+                        <td>Order Status</td>
+                        <td> : {{ order.get_status_display }}</td>
+                    </tr>
+                    <tr>
+                        <td>Shipping Charge</td>
+                        <td> : ₹{{ order.shipping_cost }}</td>
+                    </tr>
+                    <tr>
+                        <td>Total Amount</td>
+                        <td> : ₹ {{ order.total_price }}</td>
+                    </tr>
+                    <tr>
+                      <td>Payment Method</td>
+                      <td> : {% if order.payment_method == 'cod' %}Cash on Delivery{% else %}Online Payment{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <td>Payment Status</td>
+                        <td> : {{ order.get_payment_status_display }}</td>
+                    </tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="col-lg-6 col-lx-4">
+            <div class="shipping-info">
+              <h4 class="text-center pb-4">SHIPPING INFORMATION</h4>
+              <table class="table">
+                    <tr class="">
+                        <td>Full Name</td>
+                        <td> : {{ order.first_name }} {{ order.last_name }}</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td> : {{ order.email }}</td>
+                    </tr>
+                    <tr>
+                        <td>Phone No.</td>
+                        <td> : {{ order.phone }}</td>
+                    </tr>
+                    <tr>
+                        <td>Address</td>
+                        <td> : {{ order.shipping_address.address_line1 }}{% if order.shipping_address.address_line2 %}, {{ order.shipping_address.address_line2 }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <td>Country</td>
+                        <td> : {{ order.shipping_address.country }}</td>
+                    </tr>
+                    <tr>
+                        <td>Post Code</td>
+                        <td> : {{ order.shipping_address.postal_code }}</td>
+                    </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="order-items">
+        <h2>Order Items</h2>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr>
+                        <td>
+                            <div class="product-info">
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="max-width: 80px;">
+                                <div>
+                                    <h5><a href="{% url 'products:product_detail' item.product.slug %}">{{ item.product.name }}</a></h5>
+                                    {% if item.variant %}
+                                    <p>Variant: {{ item.variant }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td>₹{{ item.price }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>₹{{ item.total_price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-right"><strong>Subtotal:</strong></td>
+                        <td>₹{{ order.subtotal }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="text-right"><strong>Shipping:</strong></td>
+                        <td>₹{{ order.shipping_cost }}</td>
+                    </tr>
+                    {% if order.discount %}
+                    <tr>
+                        <td colspan="3" class="text-right"><strong>Discount:</strong></td>
+                        <td>-₹{{ order.discount }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td colspan="3" class="text-right"><strong>Total:</strong></td>
+                        <td><strong>₹{{ order.total_price }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+  </div>
+</div>
+
+<!-- Start Most Popular -->
+<div class="product-area most-popular section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="section-title">
+                    <h2>You May Also Like</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="owl-carousel popular-slider">
+                    {% for product in recommended_products %}
+                    <!-- Start Single Product -->
+                    <div class="single-product">
+                        <div class="product-img">
+                            <a href="{% url 'products:product_detail' product.slug %}">
+                                <img class="default-img" src="{{ product.image.url }}" alt="#">
+                                {% if product.image2 %}
+                                <img class="hover-img" src="{{ product.image2.url }}" alt="#">
+                                {% endif %}
+                            </a>
+                            <div class="button-head">
+                                <div class="product-action">
+                                    <a data-toggle="modal" data-target="#exampleModal" title="Quick View" href="#"><i class=" ti-eye"></i><span>Quick Shop</span></a>
+                                    <a title="Wishlist" href="#"><i class=" ti-heart "></i><span>Add to Wishlist</span></a>
+                                    <a title="Compare" href="#"><i class="ti-bar-chart-alt"></i><span>Add to Compare</span></a>
+                                </div>
+                                <div class="product-action-2">
+                                    <a title="Add to cart" href="{% url 'cart:cart_add' product.id %}">Add to cart</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3><a href="{% url 'products:product_detail' product.slug %}">{{ product.name }}</a></h3>
+                            <div class="product-price">
+                                <span>₹{{ product.price }}</span>
+                                {% if product.compare_at_price %}
+                                <del>₹{{ product.compare_at_price }}</del>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Single Product -->
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Most Popular Area -->
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        margin-bottom: 30px;
+    }
+    .card-header {
+        padding: 10px 20px;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid rgba(0,0,0,.125);
+        font-weight: 500;
+    }
+    .order-info, .shipping-info {
+        background: #ECECEC;
+        padding: 20px;
+    }
+    .order-info h4, .shipping-info h4 {
+        text-decoration: underline;
+    }
+    .table {
+        margin-bottom: 0;
+    }
+    .confirmation_part .order_boxes {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+    .section_padding {
+        padding: 20px 0;
+    }
+    .product-info {
+        display: flex;
+        align-items: center;
+    }
+    .product-info img {
+        margin-right: 15px;
+    }
+    .badge {
+        display: inline-block;
+        padding: 0.25em 0.4em;
+        font-size: 75%;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.25rem;
+    }
+    .badge-primary {
+        color: #fff;
+        background-color: #007bff;
+    }
+    .badge-warning {
+        color: #212529;
+        background-color: #ffc107;
+    }
+    .badge-success {
+        color: #fff;
+        background-color: #28a745;
+    }
+    .badge-danger {
+        color: #fff;
+        background-color: #dc3545;
+    }
+</style>
+{% endblock %}

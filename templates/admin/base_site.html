@@ -1,0 +1,2041 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<!-- SB Admin 2 CSS from Laravel public/backend/css -->
+<link href="{% static 'backend/css/sb-admin-2.min.css' %}" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="{% static 'backend/images/favicon.ico' %}"/>
+<!-- Django admin specific fixes -->
+<link href="{% static 'admin/css/django-sb-admin-fix.css' %}" rel="stylesheet" type="text/css">
+<style>
+    /* Color system - exactly matching Laravel SB Admin 2 */
+    :root {
+        --primary-color: #4e73df;
+        --primary-color-hover: #2653d4;
+        --secondary-color: #858796;
+        --success-color: #1cc88a;
+        --info-color: #36b9cc;
+        --warning-color: #f6c23e;
+        --danger-color: #e74a3b;
+        --light-color: #f8f9fc;
+        --dark-color: #5a5c69;
+        --blue-gradient-start: #4e73df;
+        --blue-gradient-end: #224abe;
+        --shadow-color: rgba(58, 59, 69, 0.15);
+        --border-color: #e3e6f0;
+    }
+    
+    body {
+        font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #858796;
+        text-align: left;
+        background-color: #f8f9fc;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        min-height: 100vh;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: 400;
+        color: #5a5c69;
+        margin-top: 0;
+    }
+    
+    a {
+        color: #4e73df;
+        text-decoration: none;
+        background-color: transparent;
+        transition: all 0.2s ease-in-out;
+    }
+    
+    a:hover {
+        color: #224abe;
+        text-decoration: underline;
+    }
+
+    /* Wrapper styles - improved for exact match */
+    #wrapper {
+        display: flex;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Sidebar styles - refined for exact match */
+    #accordionSidebar {
+        width: 14rem;
+        min-height: 100vh;
+        background-image: linear-gradient(180deg, var(--blue-gradient-start) 10%, var(--blue-gradient-end) 100%);
+        background-size: cover;
+        color: #fff;
+        flex-shrink: 0;
+        transition: width 0.15s ease-in-out;
+        position: fixed;
+        z-index: 100;
+        height: 100%;
+        overflow-y: auto;
+        box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
+    }
+
+    /* Content wrapper - carefully adjusted to exactly match Laravel */
+    #content-wrapper {
+        flex: 1;
+        overflow-x: hidden;
+        background-color: #f8f9fc;
+        display: flex;
+        flex-direction: column;
+        margin-left: 14rem;
+        width: calc(100% - 14rem);
+        transition: margin-left 0.15s ease-in-out, width 0.15s ease-in-out;
+    }
+
+    #content {
+        flex: 1;
+    }
+
+    /* Logo styling - enhanced to match exactly */
+    .eshop-logo {
+        font-size: 1.5rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05rem;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 1;
+    }
+
+    .eshop-logo .dot {
+        color: #1cc88a;
+        font-weight: 800;
+    }
+    
+    .eshop-logo .admin {
+        font-weight: 400;
+        font-size: 0.85rem;
+        text-transform: none;
+        letter-spacing: normal;
+        margin-top: 2px;
+    }
+    
+    /* Sidebar brand - perfectly aligned */
+    .sidebar-brand {
+        height: 4.375rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0;
+        padding: 1rem;
+        text-decoration: none;
+    }
+    
+    .sidebar-brand-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .sidebar-brand-icon {
+        transition: transform 0.3s ease;
+    }
+    
+    .sidebar-brand:hover .sidebar-brand-icon {
+        transform: rotate(-15deg);
+    }
+    
+    /* Sidebar divider - exact match */
+    .sidebar-divider {
+        margin: 0 1rem 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* Sidebar heading - exactly matched to Laravel */
+    .sidebar-heading {
+        text-align: left;
+        padding: 0 1rem;
+        font-weight: 800;
+        font-size: 0.65rem;
+        color: rgba(255, 255, 255, 0.4);
+        letter-spacing: 0.13rem;
+        margin-top: 0.75rem;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+    }
+
+    /* Nav items - improved for exact match */
+    .nav-item {
+        position: relative;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: all 0.15s ease-in-out;
+        border-left: 4px solid transparent;
+    }
+
+    .nav-link:hover {
+        color: #fff;
+        text-decoration: none;
+        padding-left: 1.2rem;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-link i {
+        margin-right: 0.75rem;
+        opacity: 0.75;
+        font-size: 0.85rem;
+        width: 1.5rem;
+        text-align: center;
+        transition: all 0.15s ease;
+    }
+    
+    .nav-link .float-right {
+        margin-left: auto;
+        margin-right: 0;
+        font-size: 0.85rem;
+        transition: transform 0.15s ease;
+    }
+    
+    .nav-link[data-toggle="collapse"]:hover .float-right {
+        transform: rotate(90deg);
+    }
+
+    .nav-item.active .nav-link {
+        font-weight: 700;
+        color: #fff;
+        background-color: rgba(255, 255, 255, 0.15);
+        border-left: 4px solid #fff;
+        padding-left: calc(1rem - 4px);
+    }
+
+    /* Collapsable menus - improved with animations */
+    .collapse {
+        transition: height 0.2s ease;
+    }
+    
+    .collapse-inner {
+        border-radius: 0.35rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        padding: 0.5rem 0;
+        margin: 0 0.7rem 1rem 0.7rem;
+        background-color: #fff;
+    }
+
+    .collapse-header {
+        margin: 0;
+        white-space: nowrap;
+        padding: 0.5rem 1.5rem;
+        text-transform: uppercase;
+        font-weight: 800;
+        font-size: 0.65rem;
+        color: #b7b9cc;
+    }
+
+    .collapse-item {
+        padding: 0.5rem 1rem;
+        margin: 0 0.5rem;
+        display: block;
+        color: #3a3b45;
+        text-decoration: none;
+        white-space: nowrap;
+        border-radius: 0.35rem;
+        font-size: 0.85rem;
+        transition: all 0.15s ease;
+    }
+
+    .collapse-item:hover {
+        background-color: #f8f9fc;
+        color: #3a3b45;
+        text-decoration: none;
+        font-weight: 700;
+    }
+    
+    .collapse-item:active, 
+    .collapse-item.active {
+        color: #4e73df;
+        font-weight: 700;
+        background-color: #eaecf4;
+    }
+
+    /* General button styling - refined for perfect match */
+    .btn {
+        display: inline-block;
+        font-weight: 400;
+        color: #858796;
+        text-align: center;
+        vertical-align: middle;
+        user-select: none;
+        background-color: transparent;
+        border: 1px solid transparent;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: 0.35rem;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        border-radius: 0.25rem;
+    }
+
+    .btn:focus, 
+    .btn:hover {
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        color: #fff;
+        background-color: #4e73df;
+        border-color: #4e73df;
+    }
+    
+    .btn-primary:hover {
+        color: #fff;
+        background-color: #2653d4;
+        border-color: #244bd1;
+    }
+
+    .btn-success {
+        color: #fff;
+        background-color: #1cc88a;
+        border-color: #1cc88a;
+    }
+    
+    .btn-success:hover {
+        color: #fff;
+        background-color: #17a673;
+        border-color: #169b6b;
+    }
+
+    .btn-info {
+        color: #fff;
+        background-color: #36b9cc;
+        border-color: #36b9cc;
+    }
+    
+    .btn-info:hover {
+        color: #fff;
+        background-color: #2c9faf;
+        border-color: #2a96a5;
+    }
+
+    .btn-warning {
+        color: #fff;
+        background-color: #f6c23e;
+        border-color: #f6c23e;
+    }
+    
+    .btn-warning:hover {
+        color: #fff;
+        background-color: #f4b619;
+        border-color: #f4b30d;
+    }
+
+    .btn-danger {
+        color: #fff;
+        background-color: #e74a3b;
+        border-color: #e74a3b;
+    }
+    
+    .btn-danger:hover {
+        color: #fff;
+        background-color: #e02d1b;
+        border-color: #d52a1a;
+    }
+    
+    /* Card styling - matched to Laravel pixel perfect */
+    .card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 1px solid #e3e6f0;
+        border-radius: 0.35rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 1.5rem;
+        transition: box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.2);
+    }
+
+    .card-header {
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 0;
+        background-color: #f8f9fc;
+        border-bottom: 1px solid #e3e6f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .card-header:first-child {
+        border-radius: calc(0.35rem - 1px) calc(0.35rem - 1px) 0 0;
+    }
+    
+    .card-header h6 {
+        margin-bottom: 0;
+        font-weight: 700;
+    }
+    
+    .card-header .dropdown {
+        line-height: 1;
+    }
+
+    .card-body {
+        flex: 1 1 auto;
+        min-height: 1px;
+        padding: 1.25rem;
+    }
+
+    /* Topbar - perfectly aligned */
+    .topbar {
+        height: 4.375rem;
+        background-color: #fff;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        z-index: 1;
+    }
+    
+    .navbar-search {
+        width: 25rem;
+        max-width: 100%;
+    }
+    
+    .navbar-search .input-group {
+        border: 1px solid #d1d3e2;
+        border-radius: 0.35rem;
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .navbar-search .input-group:focus-within {
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+    
+    .navbar-search input.form-control {
+        font-size: 0.85rem;
+        height: auto;
+        border: 0;
+        box-shadow: none;
+    }
+    
+    .navbar-search .input-group-append .btn {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .topbar-divider {
+        width: 0;
+        border-right: 1px solid #e3e6f0;
+        height: calc(4.375rem - 2rem);
+        margin: auto 1rem;
+    }
+
+    /* User profile dropdown - enhanced for exact match */
+    .dropdown {
+        position: relative;
+    }
+    
+    .navbar-nav {
+        display: flex;
+        padding-left: 0;
+        margin-bottom: 0;
+        list-style: none;
+        align-items: center;
+    }
+    
+    .navbar-nav .nav-item {
+        position: relative;
+    }
+    
+    .navbar-nav .nav-link {
+        color: #d1d3e2;
+        border-left: none;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .navbar-nav .nav-link:hover {
+        color: #b7b9cc;
+        background-color: transparent;
+    }
+    
+    .ml-auto {
+        margin-left: auto !important;
+    }
+    
+    .mx-1 {
+        margin-right: 0.25rem !important;
+        margin-left: 0.25rem !important;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        z-index: 1000;
+        display: none;
+        min-width: 10rem;
+        padding: 0.5rem 0;
+        margin: 0.125rem 0 0;
+        font-size: 0.85rem;
+        color: #858796;
+        background-color: #fff;
+        border: 1px solid #e3e6f0;
+        border-radius: 0.35rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        transform-origin: top right;
+        animation: dropdown-animation 0.2s ease;
+    }
+    
+    @keyframes dropdown-animation {
+        from { 
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to { 
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    .dropdown-menu.show {
+        display: block;
+    }
+    
+    .dropdown-header {
+        display: block;
+        padding: 0.5rem 1.5rem;
+        margin-bottom: 0;
+        font-size: 0.875rem;
+        color: #858796;
+        white-space: nowrap;
+        background-color: #f8f9fc;
+        font-weight: 800;
+    }
+
+    .dropdown-item {
+        display: block;
+        width: 100%;
+        padding: 0.25rem 1.5rem;
+        clear: both;
+        font-weight: 400;
+        color: #3a3b45;
+        text-align: inherit;
+        white-space: nowrap;
+        background-color: transparent;
+        border: 0;
+    }
+
+    .dropdown-item:hover {
+        color: #2e2f37;
+        text-decoration: none;
+        background-color: #f8f9fc;
+    }
+    
+    .dropdown-divider {
+        height: 0;
+        margin: 0.5rem 0;
+        overflow: hidden;
+        border-top: 1px solid #eaecf4;
+    }
+    
+    /* Icon circles in dropdowns */
+    .icon-circle {
+        height: 2.5rem;
+        width: 2.5rem;
+        border-radius: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .bg-primary {
+        background-color: #4e73df !important;
+    }
+    
+    .bg-success {
+        background-color: #1cc88a !important;
+    }
+    
+    .bg-warning {
+        background-color: #f6c23e !important;
+    }
+
+    /* Toggle sidebar button - enhanced animation */
+    #sidebarToggle {
+        width: 2.5rem;
+        height: 2.5rem;
+        text-align: center;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        background-color: rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+    }
+
+    #sidebarToggle:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+        color: rgba(255, 255, 255, 0.8);
+    }
+    
+    #sidebarToggle i {
+        font-weight: 800;
+        transition: transform 0.3s ease;
+    }
+    
+    #accordionSidebar.toggled + #content-wrapper #sidebarToggle i {
+        transform: rotate(180deg);
+    }
+
+    /* Responsive adjustments - enhanced for all screen sizes */
+    @media (max-width: 768px) {
+        #accordionSidebar {
+            width: 0;
+            box-shadow: none;
+        }
+        
+        #accordionSidebar.toggled {
+            width: 14rem;
+            box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
+        }
+        
+        #content-wrapper {
+            margin-left: 0;
+            width: 100%;
+        }
+        
+        #content-wrapper.sidebar-toggled {
+            margin-left: 14rem;
+            width: calc(100% - 14rem);
+        }
+        
+        .topbar .dropdown {
+            position: static;
+        }
+        
+        .topbar .dropdown .dropdown-menu {
+            width: calc(100% - 1.5rem);
+            right: 0.75rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .navbar-search {
+            display: none;
+        }
+        
+        .d-sm-inline-block {
+            display: none !important;
+        }
+        
+        .topbar-divider {
+            display: none;
+        }
+    }
+
+    /* Django specific adjustments - refined for exact match */
+    #container {
+        width: 100%;
+    }
+
+    #header {
+        background: transparent;
+        color: #5a5c69;
+        height: auto;
+        padding: 15px 40px;
+        line-height: normal;
+    }
+    
+    .module h2, .module caption, .inline-group h2 {
+        background: #4e73df;
+    }
+    
+    div.breadcrumbs {
+        background: #f8f9fc;
+        color: #5a5c69;
+        border-bottom: 1px solid #e3e6f0;
+        padding: 10px 40px;
+    }
+    
+    div.breadcrumbs a {
+        color: #4e73df;
+    }
+    
+    .colMS {
+        margin-right: 0 !important;
+    }
+    
+    /* Form improvements */
+    .form-control {
+        display: block;
+        width: 100%;
+        height: calc(1.5em + 0.75rem + 2px);
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #6e707e;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #d1d3e2;
+        border-radius: 0.35rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    .form-control:focus {
+        color: #6e707e;
+        background-color: #fff;
+        border-color: #bac8f3;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+    
+    /* Django admin forms enhanced */
+    form .aligned p.help {
+        margin-left: 0;
+        padding-left: 0;
+        color: #858796;
+        font-size: 0.8rem;
+    }
+    
+    .aligned label {
+        display: block;
+        padding: 4px 10px 0 0;
+        color: #5a5c69;
+        font-weight: 600;
+    }
+    
+    /* User profile in sidebar - enhanced alignment */
+    .user-profile {
+        text-align: center;
+        padding: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        margin-top: 1rem;
+    }
+    
+    .user-profile .welcome-text {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 8px;
+    }
+    
+    .user-profile .user-email {
+        font-size: 1rem;
+        color: white;
+        font-weight: 600;
+        margin-bottom: 10px;
+        word-break: break-all;
+    }
+    
+    .user-profile .user-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .user-profile .user-action-btn {
+        background-color: rgba(255, 255, 255, 0.15);
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .user-profile .user-action-btn:hover {
+        background-color: rgba(255, 255, 255, 0.25);
+        text-decoration: none;
+    }
+    
+    .user-profile .user-action-btn i {
+        margin-right: 5px;
+    }
+    
+    /* Custom badge for counters - refined */
+    .nav-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 6px;
+        border-radius: 10px;
+        background-color: rgba(255, 255, 255, 0.25);
+        color: #fff;
+        font-size: 0.7rem;
+        text-align: center;
+        line-height: 1;
+        margin-left: 8px;
+    }
+
+    /* Custom notification icon - enhanced animation */
+    .notification-icon {
+        position: relative;
+        font-size: 1.1rem;
+        color: #d1d3e2;
+        transition: all 0.2s ease;
+    }
+    
+    .notification-icon:hover {
+        color: #6e707e;
+    }
+    
+    .notification-counter {
+        position: absolute;
+        top: -0.5rem;
+        right: -0.5rem;
+        background-color: #e74a3b;
+        color: white;
+        border-radius: 50%;
+        width: 1rem;
+        height: 1rem;
+        font-size: 0.6rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(231, 74, 59, 0.7);
+        }
+        70% {
+            box-shadow: 0 0 0 5px rgba(231, 74, 59, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(231, 74, 59, 0);
+        }
+    }
+    
+    /* Dashboard Widgets - perfectly aligned */
+    .dashboard-widget {
+        position: relative;
+        padding: 1.5rem;
+        border-radius: 0.35rem;
+        color: #fff;
+        overflow: hidden;
+        transition: transform 0.2s ease;
+    }
+    
+    .dashboard-widget:hover {
+        transform: translateY(-5px);
+    }
+    
+    .dashboard-widget-icon {
+        font-size: 2.5rem;
+        opacity: 0.3;
+        position: absolute;
+        right: 1rem;
+        top: 0.5rem;
+    }
+    
+    .dashboard-widget-count {
+        font-size: 2.25rem;
+        font-weight: 700;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+    
+    .dashboard-widget-title {
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        font-weight: 700;
+    }
+    
+    .widget-primary {
+        background-color: var(--primary-color);
+    }
+    
+    .widget-success {
+        background-color: var(--success-color);
+    }
+    
+    .widget-warning {
+        background-color: var(--warning-color);
+    }
+    
+    .widget-danger {
+        background-color: var(--danger-color);
+    }
+    
+    /* Recent activity table - enhanced with animations */
+    .activity-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .activity-table th {
+        background-color: #f8f9fc;
+        color: #5a5c69;
+        font-weight: 700;
+        padding: 0.75rem;
+        border-bottom: 1px solid #e3e6f0;
+        text-align: left;
+    }
+    
+    .activity-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #e3e6f0;
+        font-size: 0.9rem;
+        vertical-align: middle;
+    }
+    
+    .activity-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .activity-table tr {
+        transition: all 0.15s ease;
+    }
+    
+    .activity-table tr:hover td {
+        background-color: #f8f9fc;
+        cursor: pointer;
+    }
+    
+    /* Status badges - refined styling */
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 10rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        display: inline-block;
+        text-align: center;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-pending {
+        background-color: rgba(246, 194, 62, 0.2);
+        color: #f6c23e;
+    }
+    
+    .status-completed {
+        background-color: rgba(28, 200, 138, 0.2);
+        color: #1cc88a;
+    }
+    
+    .status-cancelled {
+        background-color: rgba(231, 74, 59, 0.2);
+        color: #e74a3b;
+    }
+    
+    /* Better spacing for product items */
+    .product-item {
+        transition: transform 0.2s ease;
+        padding: 0.75rem;
+        border-radius: 0.35rem;
+    }
+    
+    .product-item:hover {
+        transform: translateX(5px);
+        background-color: #f8f9fc;
+    }
+    
+    .product-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Categories summary - enhanced visual */
+    .category-item {
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        transition: all 0.15s ease;
+    }
+    
+    .category-item:hover {
+        background-color: #f8f9fc;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 0.25em 0.4em;
+        font-size: 75%;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.25rem;
+    }
+    
+    .badge-pill {
+        padding-right: 0.6em;
+        padding-left: 0.6em;
+        border-radius: 10rem;
+    }
+    
+    /* Footer - exactly matched */
+    .sticky-footer {
+        margin-top: auto;
+        padding: 1.5rem 0;
+        background-color: #fff;
+        box-shadow: 0 -0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: #858796;
+        flex-shrink: 0;
+    }
+    
+    /* Utility classes for proper Django admin styling */
+    .d-flex {
+        display: flex !important;
+    }
+    
+    .flex-column {
+        flex-direction: column !important;
+    }
+    
+    .mb-4 {
+        margin-bottom: 1.5rem !important;
+    }
+    
+    .my-2 {
+        margin-top: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .my-auto {
+        margin-top: auto !important;
+        margin-bottom: auto !important;
+    }
+    
+    .ml-3 {
+        margin-left: 1rem !important;
+    }
+    
+    .mr-2 {
+        margin-right: 0.5rem !important;
+    }
+    
+    .mr-3 {
+        margin-right: 1rem !important;
+    }
+    
+    .mb-0 {
+        margin-bottom: 0 !important;
+    }
+    
+    .ml-2 {
+        margin-left: 0.5rem !important;
+    }
+    
+    .ml-md-3 {
+        margin-left: 1rem !important;
+    }
+    
+    .mr-auto {
+        margin-right: auto !important;
+    }
+    
+    .py-2 {
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+    }
+    
+    .py-3 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+    
+    /* Chart.js styling */
+    .chart-area {
+        position: relative;
+        height: 20rem;
+        width: 100%;
+    }
+    
+    /* Scroll to top button */
+    .scroll-to-top {
+        position: fixed;
+        right: 1rem;
+        bottom: 1rem;
+        width: 2.75rem;
+        height: 2.75rem;
+        text-align: center;
+        color: #fff;
+        background: rgba(90, 92, 105, 0.5);
+        line-height: 46px;
+        border-radius: 50%;
+        z-index: 99;
+        display: none;
+        transition: all 0.3s;
+    }
+    
+    .scroll-to-top:hover {
+        background: #5a5c69;
+    }
+    
+    .scroll-to-top i {
+        font-weight: 800;
+    }
+    
+    /* Form groups with better spacing */
+    .form-row {
+        margin-right: -5px;
+        margin-left: -5px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .form-group {
+        padding-right: 5px;
+        padding-left: 5px;
+        margin-bottom: 1rem;
+        position: relative;
+    }
+    
+    /* Fix input groups to match design */
+    .input-group {
+        position: relative;
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: stretch;
+        width: 100%;
+    }
+    
+    .input-group-append {
+        margin-left: -1px;
+        display: flex;
+    }
+    
+    .input-group-append .btn {
+        position: relative;
+        z-index: 2;
+    }
+    
+    /* Messages styling */
+    .alert {
+        position: relative;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: 0.35rem;
+    }
+    
+    .alert-success {
+        color: #0f6848;
+        background-color: #d2f4e8;
+        border-color: #bff0de;
+    }
+    
+    .alert-info {
+        color: #1c606a;
+        background-color: #d7f1f5;
+        border-color: #c7ebf1;
+    }
+    
+    .alert-warning {
+        color: #806520;
+        background-color: #fdf3d8;
+        border-color: #fceec9;
+    }
+    
+    .alert-danger {
+        color: #78261f;
+        background-color: #fadbd8;
+        border-color: #f8ccc8;
+    }
+</style>
+{% endblock %}
+
+{% block bodyclass %}d-flex{% endblock %}
+
+{% block blockbots %}
+{{ block.super }}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- SB Admin 2 JS from Laravel public/backend/js -->
+<script src="{% static 'backend/js/sb-admin-2.min.js' %}"></script>
+<script>
+    $(document).ready(function() {
+        // Sidebar toggle functionality with exact same animation as Laravel
+        $("#sidebarToggle, #sidebarToggleTop").on('click', function() {
+            $("#accordionSidebar").toggleClass("toggled");
+            $("#content-wrapper").toggleClass("sidebar-toggled");
+            
+            // Save the sidebar state to localStorage exactly like Laravel
+            var sidebarState = $("#accordionSidebar").hasClass("toggled") ? "toggled" : "";
+            localStorage.setItem("sidebarState", sidebarState);
+        });
+        
+        // Check for saved sidebar state
+        var savedSidebarState = localStorage.getItem("sidebarState");
+        if (savedSidebarState === "toggled") {
+            $("#accordionSidebar").addClass("toggled");
+            $("#content-wrapper").addClass("sidebar-toggled");
+        }
+        
+        // Add collapse functionality to sidebar menu items with exact same animation as Laravel
+        $(".nav-link[data-toggle='collapse']").on('click', function(e) {
+            e.preventDefault();
+            var target = $(this).attr('data-target');
+            $(target).toggleClass('show');
+            
+            // Rotate the icon exactly like Laravel
+            if($(target).hasClass('show')) {
+                $(this).find('.float-right').css('transform', 'rotate(90deg)');
+            } else {
+                $(this).find('.float-right').css('transform', 'rotate(0deg)');
+            }
+            
+            // Save the collapse state
+            localStorage.setItem(target, $(target).hasClass("show") ? "show" : "");
+        });
+        
+        // Check for saved collapse states
+        $(".collapse").each(function() {
+            var id = "#" + $(this).attr("id");
+            if (localStorage.getItem(id) === "show") {
+                $(this).addClass("show");
+                $("[data-target='" + id + "']").find('.float-right').css('transform', 'rotate(90deg)');
+            }
+        });
+        
+        // Highlight active menu item based on URL exactly like Laravel
+        var path = window.location.pathname;
+        $('.nav-link').each(function() {
+            var href = $(this).attr('href');
+            if (href && path.indexOf(href) !== -1) {
+                $(this).closest('.nav-item').addClass('active');
+                
+                // If it's a submenu item, open the parent menu exactly like Laravel
+                var parentCollapse = $(this).closest('.collapse');
+                if (parentCollapse.length) {
+                    parentCollapse.addClass('show');
+                    $("[data-target='#" + parentCollapse.attr('id') + "']").find('.float-right').css('transform', 'rotate(90deg)');
+                }
+            }
+        });
+        
+        // Add tooltip functionality exactly matching Laravel
+        $('[data-toggle="tooltip"]').tooltip();
+        
+        // Dropdown toggle with exact same animation as Laravel
+        $(".dropdown-toggle").on("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).next(".dropdown-menu").toggleClass("show");
+        });
+        
+        // Close dropdowns when clicking outside (exactly like Laravel)
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.dropdown').length) {
+                $('.dropdown-menu').removeClass('show');
+            }
+        });
+
+        // Notification badge animation exactly like Laravel
+        $('.notification-counter').each(function() {
+            $(this).addClass('animated-badge');
+        });
+
+        // Add smooth scrolling to page exactly like Laravel
+        $('a.scroll-to-top').on('click', function(e) {
+            e.preventDefault();
+            $('html, body').animate({
+                scrollTop: 0
+            }, 300);
+        });
+        
+        // Show/hide scroll-to-top button exactly like Laravel
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 100) {
+                $('.scroll-to-top').fadeIn();
+            } else {
+                $('.scroll-to-top').fadeOut();
+            }
+        });
+        
+        // Django admin form enhancements - precisely match form styling to Laravel
+        $('.form-row').addClass('mb-4');
+        $('.submit-row').addClass('d-flex justify-content-between mt-4');
+        $('input[type="submit"], button[type="submit"]').addClass('btn btn-primary');
+        $('input[type="button"]').addClass('btn btn-secondary');
+        $('.deletelink').addClass('btn btn-danger').removeClass('deletelink');
+        
+        // Form input styling - ensure identical to Laravel
+        $('input[type="text"], input[type="password"], input[type="email"], input[type="number"], select, textarea').addClass('form-control');
+        $('.vDateField, .vTimeField').addClass('form-control').css({
+            'width': 'auto',
+            'display': 'inline-block'
+        });
+        
+        // Table styling to exactly match Laravel tables
+        $('#result_list').addClass('table table-bordered table-hover activity-table');
+        $('#result_list thead th').addClass('text-gray-800 font-weight-bold');
+        $('#result_list tbody tr').addClass('text-gray-700');
+        
+        // Ensure links have correct styling
+        $('.object-tools a').addClass('btn btn-sm btn-primary ml-2 shadow-sm');
+        $('.addlink').removeClass('addlink').prepend('<i class="fas fa-plus fa-sm mr-1"></i>');
+        
+        // Make Django pagination match Laravel pagination
+        $('.paginator').addClass('d-flex justify-content-end mt-3');
+        $('.paginator a').addClass('btn btn-sm btn-light mx-1');
+        
+        // Ensure all form help text matches Laravel styling
+        $('.help').addClass('text-muted small mt-1');
+        
+        // Fix checkbox styling to match Laravel
+        $('.checkbox').each(function() {
+            $(this).addClass('custom-control custom-checkbox');
+            $(this).find('input[type="checkbox"]').addClass('custom-control-input');
+            $(this).find('label').addClass('custom-control-label');
+        });
+    });
+</script>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block body %}
+<div id="wrapper">
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <!-- Sidebar - Brand -->
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'admin:index' %}">
+            <div class="sidebar-brand-icon rotate-n-15">
+                <img src="{% static 'backend/images/logo.png' %}" alt="Logo" style="height:32px;">
+            </div>
+            <div class="sidebar-brand-text mx-3">
+                <span class="eshop-logo">E-Shop<span class="dot">.</span><span class="admin">Admin</span></span>
+            </div>
+        </a>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider my-0">
+
+        <!-- Nav Item - Dashboard -->
+        <li class="nav-item{% if request.path == '/admin/' %} active{% endif %}">
+            <a class="nav-link" href="{% url 'admin:index' %}">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+
+        <!-- Heading -->
+        <div class="sidebar-heading">
+            Shop Management
+        </div>
+
+        <!-- Products Menu -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#productCollapse">
+                <i class="fas fa-cubes"></i>
+                <span>Products</span>
+                <i class="fas fa-angle-right float-right mt-1"></i>
+            </a>
+            <div id="productCollapse" class="collapse">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">Product Options:</h6>
+                    <a class="collapse-item" href="{% url 'admin:products_product_changelist' %}">All Products</a>
+                    <a class="collapse-item" href="{% url 'admin:products_product_add' %}">Add New</a>
+                    <a class="collapse-item" href="{% url 'admin:products_category_changelist' %}">Categories</a>
+                    <a class="collapse-item" href="{% url 'admin:products_brand_changelist' %}">Brands</a>
+                    <a class="collapse-item" href="{% url 'admin:products_review_changelist' %}">Reviews</a>
+                </div>
+            </div>
+        </li>
+        
+        <!-- Orders Menu -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#orderCollapse">
+                <i class="fas fa-shopping-bag"></i>
+                <span>Orders</span>
+                <i class="fas fa-angle-right float-right mt-1"></i>
+            </a>
+            <div id="orderCollapse" class="collapse">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">Order Options:</h6>
+                    <a class="collapse-item" href="{% url 'admin:orders_order_changelist' %}">All Orders</a>
+                    <a class="collapse-item" href="{% url 'admin:orders_order_add' %}">Create New</a>
+                    <a class="collapse-item" href="{% url 'admin:index' %}#completed-orders">Completed</a>
+                    <a class="collapse-item" href="{% url 'admin:index' %}#pending-orders">Pending</a>
+                    <a class="collapse-item" href="{% url 'admin:index' %}#canceled-orders">Canceled</a>
+                </div>
+            </div>
+        </li>
+        
+        <!-- Customers Menu -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#customerCollapse">
+                <i class="fas fa-users"></i>
+                <span>Customers</span>
+                <i class="fas fa-angle-right float-right mt-1"></i>
+            </a>
+            <div id="customerCollapse" class="collapse">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">Customer Options:</h6>
+                    <a class="collapse-item" href="{% url 'admin:auth_user_changelist' %}">All Customers</a>
+                    <a class="collapse-item" href="{% url 'admin:auth_user_add' %}">Add New</a>
+                    <a class="collapse-item" href="{% url 'admin:auth_group_changelist' %}">Customer Groups</a>
+                </div>
+            </div>
+        </li>
+        
+        <!-- Blog Menu -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#blogCollapse">
+                <i class="fas fa-blog"></i>
+                <span>Blog</span>
+                <i class="fas fa-angle-right float-right mt-1"></i>
+            </a>
+            <div id="blogCollapse" class="collapse">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">Blog Options:</h6>
+                    <a class="collapse-item" href="{% url 'admin:blog_post_changelist' %}">All Posts</a>
+                    <a class="collapse-item" href="{% url 'admin:blog_post_add' %}">Add New</a>
+                    <a class="collapse-item" href="{% url 'admin:blog_category_changelist' %}">Categories</a>
+                    <a class="collapse-item" href="{% url 'admin:blog_comment_changelist' %}">Comments</a>
+                </div>
+            </div>
+        </li>
+
+        <!-- Reports -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#reportsCollapse">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+                <i class="fas fa-angle-right float-right mt-1"></i>
+            </a>
+            <div id="reportsCollapse" class="collapse">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">Analytics:</h6>
+                    <a class="collapse-item" href="{% url 'admin:index' %}#sales-report">Sales</a>
+                    <a class="collapse-item" href="{% url 'admin:index' %}#customer-report">Customers</a>
+                    <a class="collapse-item" href="{% url 'admin:index' %}#product-report">Products</a>
+                    <a class="collapse-item" href="{% url 'admin:index' %}#inventory-report">Inventory</a>
+                </div>
+            </div>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider d-none d-md-block">
+
+        <!-- Sidebar Toggler -->
+        <div class="text-center d-none d-md-inline mt-2">
+            <button class="rounded-circle border-0" id="sidebarToggle">
+                <i class="fas fa-angle-left"></i>
+            </button>
+        </div>
+
+        <!-- User Profile Area -->
+        <div class="user-profile mt-3">
+            <div class="welcome-text">Welcome,</div>
+            {% if request.user.get_full_name %}
+                <div class="user-email">{{ request.user.get_full_name }}</div>
+            {% else %}
+                <div class="user-email">{{ request.user.username }}</div>
+            {% endif %}
+            <div class="user-actions">
+                <a href="{% url 'admin:password_change' %}" class="user-action-btn">
+                    <i class="fas fa-key fa-sm"></i> Password
+                </a>
+                <a href="{% url 'admin:logout' %}" class="user-action-btn">
+                    <i class="fas fa-sign-out-alt fa-sm"></i> Logout
+                </a>
+            </div>
+        </div>
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+
+            <!-- Topbar -->
+            <nav class="topbar mb-4 static-top shadow">
+                <!-- Sidebar Toggle (Topbar) -->
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+                
+                <!-- Search Form -->
+                <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                    <div class="input-group">
+                        <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="button">
+                                <i class="fas fa-search fa-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- Topbar Navbar -->
+                <ul class="navbar-nav ml-auto">
+                    <!-- Nav Item - Alerts -->
+                    <li class="nav-item dropdown no-arrow mx-1">
+                        <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <div class="notification-icon">
+                                <i class="fas fa-bell fa-fw"></i>
+                                <span class="notification-counter">3</span>
+                            </div>
+                        </a>
+                        <!-- Dropdown - Alerts -->
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
+                            <h6 class="dropdown-header">
+                                Alerts Center
+                            </h6>
+                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                <div class="mr-3">
+                                    <div class="icon-circle bg-primary">
+                                        <i class="fas fa-file-alt text-white"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="small text-gray-500">April 19, 2025</div>
+                                    <span class="font-weight-bold">5 new orders have been placed!</span>
+                                </div>
+                            </a>
+                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                <div class="mr-3">
+                                    <div class="icon-circle bg-success">
+                                        <i class="fas fa-donate text-white"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="small text-gray-500">April 18, 2025</div>
+                                    ₹290.29 has been deposited into your account!
+                                </div>
+                            </a>
+                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                <div class="mr-3">
+                                    <div class="icon-circle bg-warning">
+                                        <i class="fas fa-exclamation-triangle text-white"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="small text-gray-500">April 17, 2025</div>
+                                    Low inventory alert: 3 products are running out of stock.
+                                </div>
+                            </a>
+                            <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                        </div>
+                    </li>
+
+                    <!-- Nav Item - Messages -->
+                    <li class="nav-item dropdown no-arrow mx-1">
+                        <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <div class="notification-icon">
+                                <i class="fas fa-envelope fa-fw"></i>
+                                <span class="notification-counter">7</span>
+                            </div>
+                        </a>
+                        <!-- Dropdown - Messages -->
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="messagesDropdown">
+                            <h6 class="dropdown-header">
+                                Message Center
+                            </h6>
+                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                <div class="font-weight-bold">
+                                    <div class="text-truncate">Hi there! I am wondering if you can help me with an order issue.</div>
+                                    <div class="small text-gray-500">Customer Name · 58m</div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                <div class="font-weight-bold">
+                                    <div class="text-truncate">I need a refund for my last order #10293.</div>
+                                    <div class="small text-gray-500">John Smith · 1d</div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                <div class="font-weight-bold">
+                                    <div class="text-truncate">When will my product be back in stock?</div>
+                                    <div class="small text-gray-500">Emily Jones · 2d</div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
+                        </div>
+                    </li>
+
+                    <div class="topbar-divider d-none d-sm-block"></div>
+
+                    <!-- Nav Item - User Information -->
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                {% if request.user.get_full_name %}
+                                    {{ request.user.get_full_name }}
+                                {% else %}
+                                    {{ request.user.username }}
+                                {% endif %}
+                            </span>
+                            <i class="fas fa-user-circle fa-lg"></i>
+                        </a>
+                        <!-- Dropdown - User Information -->
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Profile
+                            </a>
+                            <a class="dropdown-item" href="{% url 'admin:password_change' %}">
+                                <i class="fas fa-key fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Change Password
+                            </a>
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Settings
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'admin:logout' %}">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <!-- End of Topbar -->
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+                
+                {% block content_title %}{% if title %}
+                    <!-- Page Heading -->
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">{{ title }}</h1>
+                        
+                        <!-- Action buttons based on page -->
+                        {% if request.path == '/admin/' %}
+                        <div>
+                            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                <i class="fas fa-download fa-sm text-white-50"></i> Generate Report
+                            </a>
+                            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm ml-2">
+                                <i class="fas fa-plus fa-sm text-white-50"></i> Add Product
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                {% endif %}{% endblock %}
+                
+                <!-- Dashboard widgets for index page -->
+                {% if request.path == '/admin/' %}
+                <div class="row mb-4">
+                    <!-- Earnings (Monthly) Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Monthly Earnings</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">${{ monthly_earnings|default:'40,000' }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Earnings (Annual) Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Annual Earnings</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">${{ annual_earnings|default:'215,000' }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Orders Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Orders
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ orders_count|default:'125' }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customers Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Customers</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ customers_count|default:'842' }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sales Chart -->
+                <div class="row">
+                    <div class="col-xl-8 col-lg-7">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">Sales Overview</h6>
+                                <div class="dropdown no-arrow">
+                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                                        <div class="dropdown-header">Time Range:</div>
+                                        <a class="dropdown-item" href="#">Last 7 Days</a>
+                                        <a class="dropdown-item" href="#">Last 30 Days</a>
+                                        <a class="dropdown-item" href="#">Last Year</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-area">
+                                    <canvas id="salesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Categories Pie Chart -->
+                    <div class="col-xl-4 col-lg-5">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">Product Categories</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="categories-summary">
+                                    <div class="category-item d-flex justify-content-between align-items-center mb-2">
+                                        <span>Electronics</span>
+                                        <span class="badge badge-primary badge-pill">32%</span>
+                                    </div>
+                                    <div class="category-item d-flex justify-content-between align-items-center mb-2">
+                                        <span>Clothing</span>
+                                        <span class="badge badge-success badge-pill">28%</span>
+                                    </div>
+                                    <div class="category-item d-flex justify-content-between align-items-center mb-2">
+                                        <span>Home & Garden</span>
+                                        <span class="badge badge-info badge-pill">17%</span>
+                                    </div>
+                                    <div class="category-item d-flex justify-content-between align-items-center mb-2">
+                                        <span>Books</span>
+                                        <span class="badge badge-warning badge-pill">13%</span>
+                                    </div>
+                                    <div class="category-item d-flex justify-content-between align-items-center">
+                                        <span>Other</span>
+                                        <span class="badge badge-secondary badge-pill">10%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Row -->
+                <div class="row">
+
+                    <!-- Recent Orders Card -->
+                    <div class="col-xl-8 col-lg-7">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Recent Orders</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="activity-table" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Order ID</th>
+                                                <th>Customer</th>
+                                                <th>Date</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>#ORD-2345</td>
+                                                <td>John Smith</td>
+                                                <td>Apr 19, 2025</td>
+                                                <td>₹149.99</td>
+                                                <td><span class="status-badge status-pending">Pending</span></td>
+                                                <td><a href="#" class="btn btn-sm btn-primary">View</a></td>
+                                            </tr>
+                                            <tr>
+                                                <td>#ORD-2344</td>
+                                                <td>Emily Johnson</td>
+                                                <td>Apr 18, 2025</td>
+                                                <td>₹278.50</td>
+                                                <td><span class="status-badge status-completed">Completed</span></td>
+                                                <td><a href="#" class="btn btn-sm btn-primary">View</a></td>
+                                            </tr>
+                                            <tr>
+                                                <td>#ORD-2343</td>
+                                                <td>Michael Brown</td>
+                                                <td>Apr 18, 2025</td>
+                                                <td>₹532.25</td>
+                                                <td><span class="status-badge status-pending">Pending</span></td>
+                                                <td><a href="#" class="btn btn-sm btn-primary">View</a></td>
+                                            </tr>
+                                            <tr>
+                                                <td>#ORD-2342</td>
+                                                <td>Jessica Davis</td>
+                                                <td>Apr 17, 2025</td>
+                                                <td>₹89.99</td>
+                                                <td><span class="status-badge status-cancelled">Cancelled</span></td>
+                                                <td><a href="#" class="btn btn-sm btn-primary">View</a></td>
+                                            </tr>
+                                            <tr>
+                                                <td>#ORD-2341</td>
+                                                <td>Robert Wilson</td>
+                                                <td>Apr 16, 2025</td>
+                                                <td>₹324.75</td>
+                                                <td><span class="status-badge status-completed">Completed</span></td>
+                                                <td><a href="#" class="btn btn-sm btn-primary">View</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="{% url 'admin:orders_order_changelist' %}" class="btn btn-sm btn-primary">View All Orders</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Products Card -->
+                    <div class="col-xl-4 col-lg-5">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Top Selling Products</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="product-item d-flex align-items-center mb-3">
+                                    <div class="product-icon bg-primary text-white rounded-circle p-2 mr-3">
+                                        <i class="fas fa-mobile-alt"></i>
+                                    </div>
+                                    <div class="product-info flex-grow-1">
+                                        <div class="product-name font-weight-bold">Smartphone X Pro</div>
+                                        <div class="product-sales">
+                                            <div class="small text-gray-500">Sold: 87 units | Revenue: ₹43,500</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="product-item d-flex align-items-center mb-3">
+                                    <div class="product-icon bg-success text-white rounded-circle p-2 mr-3">
+                                        <i class="fas fa-headphones"></i>
+                                    </div>
+                                    <div class="product-info flex-grow-1">
+                                        <div class="product-name font-weight-bold">Wireless Headphones</div>
+                                        <div class="product-sales">
+                                            <div class="small text-gray-500">Sold: 65 units | Revenue: ₹12,350</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="product-item d-flex align-items-center mb-3">
+                                    <div class="product-icon bg-info text-white rounded-circle p-2 mr-3">
+                                        <i class="fas fa-laptop"></i>
+                                    </div>
+                                    <div class="product-info flex-grow-1">
+                                        <div class="product-name font-weight-bold">Ultrabook Pro</div>
+                                        <div class="product-sales">
+                                            <div class="small text-gray-500">Sold: 52 units | Revenue: ₹58,240</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="product-item d-flex align-items-center mb-3">
+                                    <div class="product-icon bg-warning text-white rounded-circle p-2 mr-3">
+                                        <i class="fas fa-tshirt"></i>
+                                    </div>
+                                    <div class="product-info flex-grow-1">
+                                        <div class="product-name font-weight-bold">Premium T-Shirt</div>
+                                        <div class="product-sales">
+                                            <div class="small text-gray-500">Sold: 128 units | Revenue: ₹3,840</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="product-item d-flex align-items-center">
+                                    <div class="product-icon bg-danger text-white rounded-circle p-2 mr-3">
+                                        <i class="fas fa-coffee"></i>
+                                    </div>
+                                    <div class="product-info flex-grow-1">
+                                        <div class="product-name font-weight-bold">Coffee Maker</div>
+                                        <div class="product-sales">
+                                            <div class="small text-gray-500">Sold: 45 units | Revenue: ₹8,100</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Django Admin Content -->
+                <div class="card shadow mb-4">
+                    <div class="card-body">
+                        {% if messages %}
+                        <ul class="messagelist">
+                            {% for message in messages %}
+                                <li class="alert alert-{{ message.tags }}">{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        {% block pretitle %}{% endblock %}
+                        {% block content %}
+                            {{ block.super }}
+                        {% endblock %}
+                        {% block sidebar %}{% endblock %}
+                    </div>
+                </div>
+            </div>
+            <!-- /.container-fluid -->
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Copyright &copy; E-Shop Admin {{ now|date:'Y' }}. Powered by Django.</span>
+                </div>
+            </div>
+        </footer>
+        <!-- End of Footer -->
+    </div>
+    <!-- End of Content Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+</div>
+
+<!-- Load Chart.js for dashboard analytics -->
+{% if request.path == '/admin/' %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+{% endif %}
+
+<script>
+    // Additional JavaScript utilities for admin functionality
+    $(document).ready(function() {
+        // Initialize tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+        
+        // Custom file input handling
+        $('.custom-file-input').on('change', function() {
+            var fileName = $(this).val().split('\\').pop();
+            $(this).siblings('.custom-file-label').addClass('selected').html(fileName);
+        });
+        
+        // Smooth scrolling for anchor links
+        $(document).on('click', 'a.smooth-scroll', function(event) {
+            if (this.hash !== '') {
+                event.preventDefault();
+                var hash = this.hash;
+                $('html, body').animate({
+                    scrollTop: $(hash).offset().top
+                }, 800, function(){
+                    window.location.hash = hash;
+                });
+            }
+        });
+        
+        // Scroll to top button visibility
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 100) {
+                $('.scroll-to-top').fadeIn();
+            } else {
+                $('.scroll-to-top').fadeOut();
+            }
+        });
+        
+        // Django admin form enhancements
+        $('.form-row').addClass('mb-4');
+        $('.submit-row').addClass('d-flex justify-content-between mt-4');
+        $('input[type="submit"], button[type="submit"]').addClass('btn btn-primary');
+        $('input[type="button"]').addClass('btn btn-secondary');
+        $('.deletelink').addClass('btn btn-danger').removeClass('deletelink');
+        
+        // Apply classes to Django messages
+        $('.messagelist .success').addClass('alert alert-success');
+        $('.messagelist .error').addClass('alert alert-danger');
+        $('.messagelist .warning').addClass('alert alert-warning');
+        $('.messagelist .info').addClass('alert alert-info');
+        
+        // Enhance Django tables
+        $('#result_list').addClass('table table-bordered table-hover');
+        $('.paginator').addClass('mt-3');
+        
+        // Make Django breadcrumb links more visually appealing
+        $('.breadcrumbs a').addClass('text-primary');
+        
+        // Make sure Django's object-tools get proper styling
+        $('.object-tools').addClass('float-right mb-3');
+        $('.object-tools a').addClass('btn btn-sm btn-secondary ml-2');
+        $('.addlink').removeClass('addlink').prepend('<i class="fas fa-plus mr-1"></i>');
+    });
+</script>
+{% endblock %}

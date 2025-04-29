@@ -1,0 +1,638 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% csrf_token %}
+
+    <title>{% block title %}Grocefy{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.png' %}">
+
+    <!-- Web Font -->
+    <link href="https://fonts.googleapis.com/css?family=Poppins:200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'css/font-awesome.css' %}">
+    <!-- Themify Icons -->
+    <link rel="stylesheet" href="{% static 'css/themify-icons.css' %}">
+    <!-- Magnific Popup -->
+    <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
+    <!-- Owl Carousel -->
+    <link rel="stylesheet" href="{% static 'css/owl-carousel.css' %}">
+    <!-- Slicknav -->
+    <link rel="stylesheet" href="{% static 'css/slicknav.min.css' %}">
+    <!-- Animate CSS -->
+    <link rel="stylesheet" href="{% static 'css/animate.css' %}">
+    <!-- Nice Select CSS -->
+    <link rel="stylesheet" href="{% static 'css/nice-select.css' %}">
+    <!-- jQuery UI -->
+    <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
+    <!-- Main Style CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+
+    <!-- Additional CDN resources -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/themify-icons/0.1.2/css/themify-icons.css">
+
+    <style>
+        /* Header Styles */
+        .header {
+            position: relative;
+        }
+
+        .bottom-header {
+            position: relative;
+            background: #333;
+            z-index: 9999;
+            -webkit-transition: all 0.4s ease;
+            -moz-transition: all 0.4s ease;
+            transition: all 0.4s ease;
+        }
+
+        .bottom-header.sticky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #fff !important;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            -webkit-transition: all 0.4s ease;
+            -moz-transition: all 0.4s ease;
+            transition: all 0.4s ease;
+        }
+
+        .main-menu {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            list-style: none;
+        }
+
+        .main-menu > li {
+            display: inline-block;
+            position: relative;
+            margin: 0;
+        }
+
+        .main-menu > li > a {
+            color: #fff;
+            padding: 20px 25px;
+            font-weight: 600;
+            font-size: 16px;
+            display: block;
+            -webkit-transition: all 0.4s ease;
+            -moz-transition: all 0.4s ease;
+            transition: all 0.4s ease;
+        }
+
+        .main-menu > li:hover {
+            background: #F7941D;
+            -webkit-transition: all 0.4s ease;
+            -moz-transition: all 0.4s ease;
+            transition: all 0.4s ease;
+        }
+
+        .main-menu > li.active {
+            background: #F7941D;
+        }
+
+        .main-menu > li:first-child.active {
+            background: transparent;
+        }
+
+        /* Sticky Menu Styles */
+        .bottom-header.sticky .main-menu > li > a {
+            color: #333;
+        }
+
+        .bottom-header.sticky .main-menu > li:hover > a {
+            color: #fff;
+        }
+
+        .bottom-header.sticky .main-menu > li.active > a {
+            color: #fff;
+        }
+
+        .bottom-header.sticky .main-menu > li:first-child.active > a {
+            color: #333;
+        }
+
+        .bottom-header.sticky .main-menu > li:first-child:hover > a {
+            color: #fff;
+        }
+
+        /* Content wrapper styles */
+        .main-content {
+            position: relative;
+            padding-top: 0;
+            -webkit-transition: padding 0.4s ease;
+            -moz-transition: padding 0.4s ease;
+            transition: padding 0.4s ease;
+        }
+
+        body.sticky-nav .main-content {
+            padding-top: 61px;
+        }
+        
+        /* Dropdown Menu Styles */
+        .main-menu li {
+            position: relative;
+        }
+        
+        .main-menu li .dropdown {
+            position: absolute;
+            width: 220px;
+            background: #fff;
+            padding: 5px 0;
+            left: 0;
+            top: 100%;
+            z-index: 9999;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .main-menu li:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .main-menu li .dropdown li {
+            display: block;
+            margin: 0;
+        }
+        
+        .main-menu li .dropdown li a {
+            display: block;
+            padding: 10px 20px;
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .main-menu li .dropdown li a i {
+            float: right;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #777;
+        }
+        
+        .main-menu li .dropdown li a:hover {
+            color: #fff;
+            background: #F7941D;
+        }
+        
+        .main-menu li .dropdown li a:hover i {
+            color: #fff;
+        }
+        
+        /* Sub Dropdown */
+        .main-menu li .dropdown li.has-dropdown {
+            position: relative;
+        }
+        
+        .main-menu li .dropdown li .sub-dropdown {
+            position: absolute;
+            width: 220px;
+            background: #fff;
+            left: 100%;
+            top: 0;
+            z-index: 99;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .main-menu li .dropdown li:hover .sub-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="js">
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="preloader-inner">
+            <div class="preloader-icon">
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+    <!-- End Preloader -->
+
+    <!-- Header -->
+    <header class="header">
+        <!-- Top Header -->
+        <div class="top-header" style="background-color: #fff; padding: 15px 0; border-bottom: 1px solid #eee;">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <div class="top-left d-flex align-items-center">
+                            <a href="tel:123456789" class="me-4" style="color: #333; text-decoration: none; font-size: 14.5px; margin-right: 35px;">
+                                <i class="fas fa-phone" style="color: #F7941D; font-size: 15px; margin-right: 8px;"></i>
+                                <span style="font-weight: 600;">123456789</span>
+                            </a>
+                            <a href="mailto:abc@gmail.com" style="color: #333; text-decoration: none; font-size: 14.5px;">
+                                <i class="far fa-envelope" style="color: #F7941D; font-size: 15px; margin-right: 8px;"></i>
+                                <span style="font-weight: 600;">grocefy@gmail.com</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="top-right d-flex justify-content-end align-items-center">
+                            <a href="{% url 'orders:order_track' %}" class="me-5" style="color: #333; text-decoration: none; font-size: 14.5px; margin-right: 35px;">
+                                <i class="fas fa-map-marker-alt" style="color: #F7941D; font-size: 15px; margin-right: 8px;"></i>
+                                Track Order
+                            </a>
+                            {% if user.is_authenticated %}
+                                {% if user.is_staff or user.is_superuser %}
+                                <div class="dropdown">
+                                    <a href="#" id="userDropdown" style="color: #333; text-decoration: none; font-size: 14.5px;" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-user" style="color: #F7941D; font-size: 15px; margin-right: 8px;"></i>
+                                        {{ user.username }} <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i>
+                                    </a>
+                                    <ul class="dropdown-menu border-0 shadow" aria-labelledby="userDropdown" style="min-width: 180px; padding: 10px 0;">
+                                        <li><a class="dropdown-item" href="{% url 'admin:index' %}" target="_blank">
+                                            <i class="fas fa-tachometer-alt" style="color: #F7941D; font-size: 15px; margin-right: 8px;"></i>Dashboard</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">My Profile</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form method="post" action="{% url 'accounts:logout' %}" style="margin:0;padding:0;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="dropdown-item">
+                                                    <i class="fas fa-sign-out-alt" style="color: #F7941D; font-size: 15px; margin-right: 8px;"></i>Logout
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                                {% else %}
+                                <div class="custom-dropdown" style="position: relative; display: inline-block;">
+                                    <a href="#" id="customerDropdownSimple" style="color: #333; text-decoration: none; font-size: 14.5px;">
+                                        <i class="fas fa-user" style="color: #F7941D; font-size: 15px; margin-right: 8px;"></i>
+                                        {{ user.username }} <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i>
+                                    </a>
+                                    <div class="custom-dropdown-content border-0 shadow" style="display: none; position: absolute; background-color: white; min-width: 180px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 10000; padding: 10px 0; right: 0; border-radius: 4px;">
+                                        <a class="dropdown-item" href="{% url 'accounts:profile' %}" style="display: block; padding: 8px 16px; text-decoration: none; color: black;">
+                                            <i class="fas fa-user-circle" style="color: #F7941D; font-size: 15px; margin-right: 8px;"></i>My Profile
+                                        </a>
+                                        <a class="dropdown-item" href="{% url 'orders:order_list' %}" style="display: block; padding: 8px 16px; text-decoration: none; color: black;">
+                                            <i class="fas fa-shopping-bag" style="color: #F7941D; font-size: 15px; margin-right: 8px;"></i>My Orders
+                                        </a>
+                                        <a class="dropdown-item" href="{% url 'products:wishlist' %}" style="display: block; padding: 8px 16px; text-decoration: none; color: black;">
+                                            <i class="fas fa-heart" style="color: #F7941D; font-size: 15px; margin-right: 8px;"></i>My Wishlist
+                                        </a>
+                                        <hr style="margin: 8px 0;">
+                                        <a class="dropdown-item" href="{% url 'accounts:logout' %}" style="display: block; padding: 8px 16px; text-decoration: none; color: black;">
+                                            <i class="fas fa-sign-out-alt" style="color: #F7941D; font-size: 15px; margin-right: 8px;"></i>Logout
+                                        </a>
+                                    </div>
+                                </div>
+                                <script>
+                                    document.getElementById('customerDropdownSimple').addEventListener('click', function(e) {
+                                        e.preventDefault();
+                                        var dropdownContent = document.querySelector('.custom-dropdown-content');
+                                        if (dropdownContent.style.display === 'block') {
+                                            dropdownContent.style.display = 'none';
+                                        } else {
+                                            dropdownContent.style.display = 'block';
+                                        }
+                                    });
+                                    
+                                    // Close the dropdown when clicking elsewhere on the page
+                                    document.addEventListener('click', function(e) {
+                                        if (!e.target.closest('.custom-dropdown')) {
+                                            var dropdownContent = document.querySelector('.custom-dropdown-content');
+                                            if (dropdownContent) {
+                                                dropdownContent.style.display = 'none';
+                                            }
+                                        }
+                                    });
+                                </script>
+                                {% endif %}
+                            {% else %}
+                            <a href="{% url 'accounts:login' %}" style="color: #333; text-decoration: none; font-size: 14.5px;">
+                                <i class="fas fa-user" style="color: #F7941D; font-size: 15px; margin-right: 8px;"></i>
+                                Login / Register
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle Header -->
+        <div class="middle-header" style="background-color: #fff; padding: 10px 0;">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-3">
+                        <div class="logo">
+                            <a href="{% url 'core:home' %}">
+                                <img src="/media/images/logo1.png" alt="Grocefy Logo" style="max-width: 140px;">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="search-bar d-flex align-items-center">
+                            <form action="{% url 'products:product_list' %}" method="GET" class="d-flex w-100">
+                                <div class="dropdown me-2" style="width: 160px;">
+                                    <select class="form-select" name="category" style="height: 38px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; padding: 0 15px; background-color: #fff; cursor: pointer; text-align: center;">
+                                        <option value="">All Category</option>
+                                        {% for category in categories %}
+                                        <option value="{{ category.slug }}">{{ category.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="input-group" style="height: 38px;">
+                                    <input type="text" class="form-control" name="q" placeholder="Search Products Here....." style="border: 1px solid #ddd; border-right: none; height: 100%; font-size: 14px; padding: 0 15px; border-radius: 4px 0 0 4px;">
+                                    <button class="btn" type="submit" style="background-color: #333; color: #fff; border-radius: 0 4px 4px 0; padding: 0 20px; height: 100%;">
+                                        <i class="fas fa-search" style="font-size: 14px;"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="header-icons d-flex justify-content-end align-items-center">
+                            <a href="{% url 'products:wishlist' %}" class="icon-link" style="color: #333; text-decoration: none; position: relative; margin-right: 30px;">
+                                <i class="far fa-heart" style="font-size: 20px;"></i>
+                                <span class="count" style="position: absolute; top: -8px; right: -8px; background: #F7941D; color: #fff; font-size: 10px; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">{{ wishlist_count|default:0 }}</span>
+                            </a>
+                            <a href="{% url 'cart:cart_detail' %}" class="icon-link" style="color: #333; text-decoration: none; position: relative;">
+                                <i class="fas fa-shopping-cart" style="font-size: 20px;"></i>
+                                <span class="count" style="position: absolute; top: -8px; right: -8px; background: #F7941D; color: #fff; font-size: 10px; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">{{ request.cart.total_items|default:0 }}</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Header -->
+        <div class="bottom-header">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <nav class="navbar navbar-expand-lg" style="padding: 0;">
+                            <div class="navbar-collapse">
+                                <ul class="nav main-menu">
+                                    <li class="{% if request.path == '/' %}active{% endif %}">
+                                        <a href="{% url 'core:home' %}">Home</a>
+                                    </li>
+                                    <li class="{% if 'about' in request.path %}active{% endif %}">
+                                        <a href="{% url 'core:about_us' %}">About Us</a>
+                                    </li>
+                                    <li class="{% if 'products' in request.path %}active{% endif %}">
+                                        <a href="{% url 'products:product_list' %}">Products</a>
+                                        <span style="position: absolute; top: 2px; right: 2px; background: #F7941D; color: #fff; font-size: 9px; padding: 1px 5px; border-radius: 2px; font-weight: 500;">NEW</span>
+                                    </li>
+                                    <li class="{% if 'category' in request.path %}active{% endif %}">
+                                        <a href="#">
+                                            Category <i class="fas fa-chevron-down" style="font-size: 12px; margin-left: 4px;"></i>
+                                        </a>
+                                        <ul class="dropdown border-0 shadow">
+                                            {% for category in categories %}
+                                                {% if category.children.exists %}
+                                                    <li class="has-dropdown">
+                                                        <a href="{% url 'products:category' category.slug %}">{{ category.name }}<i class="fas fa-angle-right" style="float: right; margin-top: 3px;"></i></a>
+                                                        <ul class="dropdown sub-dropdown border-0 shadow">
+                                                            {% for child in category.children.all %}
+                                                                <li><a href="{% url 'products:subcategory' category.slug child.slug %}">{{ child.name }}</a></li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    </li>
+                                                {% else %}
+                                                    <li><a href="{% url 'products:category' category.slug %}">{{ category.name }}</a></li>
+                                                {% endif %}
+                                            {% empty %}
+                                                <li><a href="#">No categories available</a></li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                    <li class="{% if 'contact' in request.path %}active{% endif %}">
+                                        <a href="{% url 'core:contact_us' %}">Contact Us</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!--/ End Header -->
+
+    <!-- Messages -->
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div id="content" class="main-content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Start Footer Area -->
+    <footer class="footer" style="padding-top: 60px; background: #222;">
+        <div class="container">
+            <div class="row">
+                <!-- Logo and Description -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <a href="{% url 'core:home' %}">
+                        <img src="/media/images/logo.png" alt="Grocefy" class="mb-4" style="max-width: 200px;">
+                    </a>
+                    <p style="color: #b4b4b4; line-height: 1.8;">
+                        Grocefy is an online grocery platform designed to make your shopping experience fast, convenient, and reliable. We offer a wide range of fresh produce, pantry items, beverages, and more at competitive prices. Our user-friendly website ensures seamless browsing, secure payments, and personalized recommendations.
+                    </p>
+                    <div class="mt-4">
+                        <p style="color: #fff; margin-bottom: 5px;">Got Question? Call us 24/7</p>
+                        <h3 style="color: #F7941D; font-size: 24px; margin: 0;">123456789</h3>
+                    </div>
+                </div>
+
+                <!-- Information Links -->
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h4 style="color: #fff; margin-bottom: 25px; font-size: 18px;">Information</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li class="mb-2"><a href="#" style="color: #b4b4b4; text-decoration: none; transition: all 0.3s;">About Us</a></li>
+                        <li class="mb-2"><a href="#" style="color: #b4b4b4; text-decoration: none; transition: all 0.3s;">Faq</a></li>
+                        <li class="mb-2"><a href="#" style="color: #b4b4b4; text-decoration: none; transition: all 0.3s;">Terms & Conditions</a></li>
+                        <li class="mb-2"><a href="#" style="color: #b4b4b4; text-decoration: none; transition: all 0.3s;">Contact Us</a></li>
+                        <li class="mb-2"><a href="#" style="color: #b4b4b4; text-decoration: none; transition: all 0.3s;">Help</a></li>
+                    </ul>
+                </div>
+
+                <!-- Customer Service -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h4 style="color: #fff; margin-bottom: 25px; font-size: 18px;">Customer Service</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li class="mb-2"><a href="#" style="color: #b4b4b4; text-decoration: none; transition: all 0.3s;">Payment Methods</a></li>
+                        <li class="mb-2"><a href="#" style="color: #b4b4b4; text-decoration: none; transition: all 0.3s;">Money-back</a></li>
+                        <li class="mb-2"><a href="#" style="color: #b4b4b4; text-decoration: none; transition: all 0.3s;">Returns</a></li>
+                        <li class="mb-2"><a href="#" style="color: #b4b4b4; text-decoration: none; transition: all 0.3s;">Shipping</a></li>
+                        <li class="mb-2"><a href="#" style="color: #b4b4b4; text-decoration: none; transition: all 0.3s;">Privacy Policy</a></li>
+                    </ul>
+                </div>
+
+                <!-- Get In Touch -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h4 style="color: #fff; margin-bottom: 25px; font-size: 18px;">Get In Touch</h4>
+                    <ul style="list-style: none; padding: 0; color: #b4b4b4;">
+                        <li class="mb-2">mahaganapathy st, alagapatty road, musiri, 121211</li>
+                        <li class="mb-2">grocefy@gmail.com</li>
+                        <li class="mb-2">123456789</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Copyright Section -->
+        <div class="copyright" style="background-color: #1a1a1a; padding: 20px 0; margin-top: 40px;">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p style="color: #b4b4b4; margin: 0;">Copyright © {% now "Y" %} Sujith S - All Rights Reserved.</p>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <img src="{% static 'images/payments.png' %}" alt="Payment Methods" style="max-height: 30px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- End Footer Area -->
+
+    <style>
+    .footer a:hover {
+        color: #F7941D !important;
+    }
+    
+    .footer ul li {
+        margin-bottom: 12px;
+    }
+    
+    .footer h4 {
+        position: relative;
+        margin-bottom: 30px;
+    }
+    
+    .footer h4:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -10px;
+        width: 40px;
+        height: 2px;
+        background: #F7941D;
+    }
+    </style>
+
+    <!-- jQuery JS -->
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/jquery-migrate-3.0.0.js' %}"></script>
+    <!-- Popper JS -->
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <!-- jQuery UI JS -->
+    <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+    <!-- Slicknav JS -->
+    <script src="{% static 'js/slicknav.min.js' %}"></script>
+    <!-- Owl Carousel JS -->
+    <script src="{% static 'js/owl-carousel.js' %}"></script>
+    <!-- Magnific Popup JS -->
+    <script src="{% static 'js/magnific-popup.js' %}"></script>
+    <!-- Nice Select JS -->
+    <script src="{% static 'js/nicesellect.js' %}"></script>
+    <!-- Sticky JS -->
+    <script src="{% static 'js/sticky.js' %}"></script>
+    <!-- ScrollUp JS -->
+    <script src="{% static 'js/jquery.scrollUp.min.js' %}"></script>
+    <!-- Waypoints JS -->
+    <script src="{% static 'js/waypoints.min.js' %}"></script>
+    <!-- Counter Up JS -->
+    <script src="{% static 'js/jquery.counterup.min.js' %}"></script>
+    <!-- Main JS -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+
+    <script>
+    $(document).ready(function() {
+        var bottomHeader = $('.bottom-header');
+        var headerOffset = bottomHeader.offset().top;
+        var isSticky = false;
+
+        // Initialize all dropdowns manually
+        $('.dropdown-toggle, [data-bs-toggle="dropdown"]').each(function() {
+            new bootstrap.Dropdown(this);
+        });
+        
+        // Add direct click handler for customer dropdown
+        $('#customerDropdown').on('click', function(e) {
+            e.preventDefault();
+            var dropdownMenu = $(this).next('.dropdown-menu');
+            if (dropdownMenu.hasClass('show')) {
+                dropdownMenu.removeClass('show');
+            } else {
+                $('.dropdown-menu').removeClass('show');
+                dropdownMenu.addClass('show');
+            }
+        });
+
+        // Close dropdown when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.dropdown').length) {
+                $('.dropdown-menu').removeClass('show');
+            }
+        });
+
+        function handleSticky() {
+            var currentScroll = $(window).scrollTop();
+            
+            if (currentScroll > headerOffset && !isSticky) {
+                bottomHeader.addClass('sticky');
+                $('body').addClass('sticky-nav');
+                isSticky = true;
+            } else if (currentScroll <= headerOffset && isSticky) {
+                bottomHeader.removeClass('sticky');
+                $('body').removeClass('sticky-nav');
+                isSticky = false;
+            }
+        }
+
+        $(window).on('scroll', function() {
+            requestAnimationFrame(handleSticky);
+        });
+
+        // Initial check on page load
+        handleSticky();
+    });
+    </script>
+</body>
+</html>

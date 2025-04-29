@@ -1,0 +1,571 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load product_filters %}
+
+{% block title %}Shop - Grocefy{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="bread-inner">
+                    <ul class="bread-list">
+                        <li><a href="{% url 'core:home' %}">Home<i class="ti-arrow-right"></i></a></li>
+                        <li class="active"><a href="#">Shop Grid</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumbs -->
+
+<!-- Product Area -->
+<div class="product-area section">
+    <div class="container">
+        <div class="row">
+            <!-- Categories Sidebar -->
+            <div class="col-lg-3 col-md-4 col-12">
+                <div class="shop-sidebar">
+                    <div class="single-widget category">
+                        <h3 class="title">Categories</h3>
+                        <ul class="categor-list">
+                            {% for category in categories %}
+                            <li>
+                                <a href="?category={{ category.slug }}">{{ category.name }}</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Product Grid -->
+            <div class="col-lg-9 col-md-8 col-12">
+                <!-- Filter Options -->
+                <div class="shop-top" style="background: #fff; padding: 15px 0; margin-bottom: 30px; border-bottom: 1px solid #eee;">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="shop-shorter" style="display: flex; align-items: center;">
+                                <span style="margin: 0 10px 0 0; color: #666; font-size: 14px;">Show :</span>
+                                <select class="nice-select" style="padding: 0 20px; height: 35px; border: 1px solid #eee; font-size: 14px; min-width: 100px; background: #fff;">
+                                    <option>Default</option>
+                                    <option>09</option>
+                                    <option>15</option>
+                                    <option>25</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="shop-shorter" style="display: flex; align-items: center;">
+                                <span style="margin: 0 10px 0 0; color: #666; font-size: 14px;">Sort By :</span>
+                                <select class="nice-select" style="padding: 0 20px; height: 35px; border: 1px solid #eee; font-size: 14px; min-width: 100px; background: #fff;">
+                                    <option>Default</option>
+                                    <option>Name</option>
+                                    <option>Price</option>
+                                    <option>Size</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <ul class="view-mode" style="list-style: none; margin: 0; padding: 0; display: flex; gap: 5px;">
+                                <li class="active">
+                                    <a href="javascript:void(0)" style="background: #F7941D; color: #fff; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fa fa-th-large"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0)" style="background: #f6f7fb; color: #666; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fa fa-list"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="row">
+                    {% for product in products %}
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <div class="single-product" style="margin-bottom: 30px; background: #fff; border: 1px solid #eee; transition: all 0.3s ease;">
+                            <div class="product-img" style="position: relative; overflow: hidden;">
+                                {% if product.photo %}
+                                <a href="{{ product.get_absolute_url }}">
+                                    <img class="default-img" src="{{ product.photo.url }}" alt="{{ product.title }}" style="width: 100%; height: auto;">
+                                </a>
+                                {% endif %}
+                                {% if product.discount > 0 %}
+                                <span class="price-dec" style="position: absolute; top: 10px; right: 10px; background: #ff9800; color: #fff; padding: 3px 12px; font-size: 13px;">{{ product.discount }}% OFF</span>
+                                {% endif %}
+                                <div class="button-head" style="position: absolute; bottom: -50px; left: 0; right: 0; background: rgba(0,0,0,0.8); padding: 10px 0; transition: all 0.3s ease;">
+                                    <div class="product-action" style="text-align: center;">
+                                        <a href="javascript:void(0)" style="color: #fff; margin: 0 3px;"><i class="fa fa-heart"></i></a>
+                                        <a href="javascript:void(0)" style="color: #fff; margin: 0 3px;"><i class="fa fa-shopping-cart"></i></a>
+                                        <a href="javascript:void(0)" style="color: #fff; margin: 0 3px;"><i class="fa fa-search"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="product-content" style="padding: 15px; text-align: center;">
+                                <h3 style="font-size: 15px; margin-bottom: 8px;"><a href="{{ product.get_absolute_url }}" style="color: #333; text-decoration: none;">{{ product.title }}</a></h3>
+                                <div class="product-price" style="color: #F7941D; font-size: 16px; font-weight: 500;">
+                                    {% if product.discount > 0 %}
+                                        {% with discounted_price=product.price|multiply:product.discount|divide:100|subtract:product.price|abs %}
+                                        <span>₹{{ discounted_price|floatformat:2 }}</span>
+                                        <del style="color: #666; margin-left: 5px; font-size: 14px;">₹{{ product.price|floatformat:2 }}</del>
+                                        {% endwith %}
+                                    {% else %}
+                                        <span>₹{{ product.price|floatformat:2 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Product Area -->
+
+<!-- Modal -->
+{% if products %}
+    {% for product in products %}
+    <div class="modal fade" id="{{ product.id }}" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span class="ti-close" aria-hidden="true"></span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row no-gutters">
+                        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                            <!-- Product Slider -->
+                            <div class="product-gallery">
+                                <div class="quickview-slider-active">
+                                    {% if product.photo %}
+                                    <div class="single-slider">
+                                        <img src="{{ product.photo.url }}" alt="{{ product.title }}">
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <!-- End Product slider -->
+                        </div>
+                        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                            <div class="quickview-content">
+                                <h2>{{ product.title }}</h2>
+                                <div class="quickview-ratting-review">
+                                    <div class="quickview-ratting-wrap">
+                                        <div class="quickview-ratting">
+                                            {% with ''|center:product.get_rating|default:0 as range %}
+                                            {% for _ in range %}
+                                            <i class="yellow fa fa-star"></i>
+                                            {% endfor %}
+                                            {% endwith %}
+                                            {% with ''|center:5|default:0|subtract:product.get_rating|default:0 as range %}
+                                            {% for _ in range %}
+                                            <i class="fa fa-star"></i>
+                                            {% endfor %}
+                                            {% endwith %}
+                                        </div>
+                                        <a href="#"> ({{ product.get_reviews_count|default:0 }} customer review)</a>
+                                    </div>
+                                    <div class="quickview-stock">
+                                        {% if product.stock > 0 %}
+                                        <span><i class="fa fa-check-circle-o"></i> {{ product.stock }} in stock</span>
+                                        {% else %}
+                                        <span><i class="fa fa-times-circle-o text-danger"></i> {{ product.stock }} out stock</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% if product.discount > 0 %}
+                                    {% with discounted_price=product.price|multiply:product.discount|divide:100|subtract:product.price|abs %}
+                                    <h3><small><del class="text-muted">₹{{ product.price|floatformat:2 }}</del></small>    ₹{{ discounted_price|floatformat:2 }}  </h3>
+                                    {% endwith %}
+                                {% else %}
+                                    <h3>₹{{ product.price|floatformat:2 }}</h3>
+                                {% endif %}
+                                <div class="quickview-peragraph">
+                                    <p>{{ product.summary }}</p>
+                                </div>
+                                <form action="{% url 'cart:cart_add' product.id %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="quantity">
+                                        <!-- Input Order - NEW STYLE -->
+                                        <div class="quantity-counter" style="display: flex; align-items: center; margin-top: 10px; margin-bottom: 20px;">
+                                            <button type="button" class="quantity-btn minus" style="width: 40px; height: 40px; border: 1px solid #ddd; background: #f7f7f7; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; border-radius: 4px 0 0 4px;">−</button>
+                                            <input type="text" name="quantity" value="1" class="quantity-input" style="width: 60px; height: 40px; border: 1px solid #ddd; border-left: none; border-right: none; text-align: center; font-size: 16px; background: #fff; color: #333; padding: 5px;">
+                                            <button type="button" class="quantity-btn plus" style="width: 40px; height: 40px; border: 1px solid #ddd; background: #f7f7f7; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; border-radius: 0 4px 4px 0;">+</button>
+                                        </div>
+                                        <!--/ End Input Order -->
+                                    </div>
+                                    <div class="add-to-cart">
+                                        <button type="submit" class="btn">Add to cart</button>
+                                        <a href="{% url 'products:add_to_wishlist' product.id %}" class="btn min"><i class="ti-heart"></i></a>
+                                    </div>
+                                </form>
+                                <div class="default-social">
+                                    <h4 class="share-now">Share:</h4>
+                                    <ul>
+                                        <li><a class="facebook" href="#"><i class="fa fa-facebook"></i></a></li>
+                                        <li><a class="twitter" href="#"><i class="fa fa-twitter"></i></a></li>
+                                        <li><a class="youtube" href="#"><i class="fa fa-pinterest-p"></i></a></li>
+                                        <li><a class="dribbble" href="#"><i class="fa fa-google-plus"></i></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+<!-- Modal end -->
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Breadcrumbs styling */
+    .breadcrumbs {
+        background-color: #f6f6f6;
+        padding: 30px 0;
+        margin-bottom: 30px;
+        border-bottom: 1px solid #e8e8e8;
+    }
+    .breadcrumbs .bread-inner {
+        margin: 0;
+    }
+    .breadcrumbs .bread-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .breadcrumbs .bread-list li {
+        display: inline-block;
+        position: relative;
+        font-size: 16px;
+        margin: 0;
+    }
+    .breadcrumbs .bread-list li a {
+        color: #333;
+        text-decoration: none;
+    }
+    .breadcrumbs .bread-list li i {
+        margin: 0 8px;
+        font-size: 13px;
+        color: #666;
+    }
+    .breadcrumbs .bread-list li.active a {
+        color: #F7941D;
+        text-decoration: none;
+    }
+    
+    /* Quantity buttons styling */
+    .quantity .input-group {
+        width: 150px;
+        display: flex;
+        flex-direction: row;
+    }
+    .quantity .input-group .button {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+    }
+    .quantity .input-group .button.minus {
+        border-radius: 3px 0 0 3px;
+        overflow: hidden;
+    }
+    .quantity .input-group .button.plus {
+        border-radius: 0 3px 3px 0;
+        overflow: hidden;
+    }
+    .quantity .input-group .button button {
+        background: transparent;
+        color: #666;
+        border: 1px solid #ccc;
+        border-radius: 0;
+        height: 40px;
+        width: 40px;
+        padding: 0;
+        display: block;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 12px;
+    }
+    .quantity .input-group .button button:hover {
+        background: #F7941D;
+        color: #fff;
+        border-color: #F7941D;
+    }
+    .quantity .input-group .input-number {
+        height: 40px;
+        width: 70px !important;
+        border: 1px solid #ccc;
+        border-radius: 0;
+        text-align: center;
+        font-size: 14px;
+        border-left: none;
+        border-right: none;
+        display: inline-block;
+        line-height: 40px;
+        background: #fff;
+        padding: 0 5px;
+        color: #333;
+        -moz-appearance: textfield;
+    }
+    
+    .quantity .input-group .input-number::-webkit-outer-spin-button,
+    .quantity .input-group .input-number::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Quick View Modal */
+    .modal .quickview-slider-active img {
+        width: 100%;
+    }
+    .modal .modal-header {
+        padding: 0;
+        border: none;
+    }
+    .modal .modal-header .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: #333;
+        opacity: 1;
+        z-index: 1000;
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        background: #fff;
+        text-align: center;
+        font-size: 15px;
+        border-radius: 100%;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    .modal .quickview-content {
+        padding: 30px;
+    }
+    .modal .quickview-content h2 {
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
+    .modal .quickview-content .quickview-ratting-review {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+    .modal .quickview-content .quickview-ratting-wrap {
+        display: flex;
+        align-items: center;
+    }
+    .modal .quickview-content .quickview-ratting {
+        display: inline-block;
+        margin-right: 5px;
+    }
+    .modal .quickview-content .quickview-ratting .yellow {
+        color: #F7941D;
+    }
+    .modal .quickview-content h3 {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 15px 0;
+    }
+    .modal .quickview-content h3 small del {
+        font-size: 16px;
+        color: #999;
+        margin-right: 10px;
+    }
+    .modal .quickview-content .quickview-peragraph {
+        margin-bottom: 20px;
+    }
+    .modal .quickview-content .add-to-cart {
+        margin-top: 20px;
+    }
+    .modal .quickview-content .add-to-cart .btn {
+        background: #F7941D;
+        color: #fff;
+        padding: 10px 25px;
+        border-radius: 3px;
+        font-weight: 500;
+        border: none;
+    }
+    .modal .quickview-content .add-to-cart .btn.min {
+        background: #fff;
+        color: #333;
+        border: 1px solid #ddd;
+        padding: 10px 15px;
+        margin-left: 10px;
+    }
+    .modal .quickview-content .add-to-cart .btn.min:hover {
+        color: #F7941D;
+    }
+    .modal .quickview-content .default-social {
+        margin-top: 20px;
+    }
+    .modal .quickview-content .default-social h4 {
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+    .modal .quickview-content .default-social ul {
+        display: inline-block;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .modal .quickview-content .default-social ul li {
+        display: inline-block;
+        margin-right: 10px;
+    }
+    .modal .quickview-content .default-social ul li:last-child {
+        margin-right: 0;
+    }
+    .modal .quickview-content .default-social ul li a {
+        height: 35px;
+        width: 35px;
+        line-height: 35px;
+        text-align: center;
+        display: block;
+        border-radius: 100%;
+        font-size: 14px;
+    }
+    .modal .quickview-content .default-social ul li a.facebook {
+        background: #3B5999;
+        color: #fff;
+    }
+    .modal .quickview-content .default-social ul li a.twitter {
+        background: #1DA1F2;
+        color: #fff;
+    }
+    .modal .quickview-content .default-social ul li a.youtube {
+        background: #D42428;
+        color: #fff;
+    }
+    .modal .quickview-content .default-social ul li a.dribbble {
+        background: #EA4C89;
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/custom/quantity-fix.js' %}"></script>
+<script>
+    $(document).ready(function(){
+        // New quantity counter implementation
+        $('.quantity-btn').on('click', function() {
+            var $button = $(this);
+            var $input = $button.parent().find('.quantity-input');
+            var oldValue = parseInt($input.val());
+            var newVal;
+
+            if ($button.hasClass('plus')) {
+                // Don't allow incrementing beyond max stock (use a reasonable default)
+                var maxStock = 999;
+                newVal = (oldValue >= maxStock) ? maxStock : oldValue + 1;
+            } else {
+                // Don't allow decrementing below 1
+                newVal = (oldValue <= 1) ? 1 : oldValue - 1;
+            }
+
+            $input.val(newVal);
+            $input.trigger('change');
+        });
+
+        // Legacy quantity handlers (kept for backward compatibility)
+        $('.btn-number').on('click', function(e) {
+            e.preventDefault();
+            
+            var fieldName = $(this).attr('data-field');
+            var type = $(this).attr('data-type');
+            var input = $("input[name='" + fieldName + "']").eq($(this).closest('.modal').index('.modal'));
+            
+            if (input.length === 0) {
+                // If we can't find the input in the modal, try global
+                input = $("input[name='" + fieldName + "']");
+            }
+            
+            var currentVal = parseInt(input.val());
+            
+            if (!isNaN(currentVal)) {
+                if (type == 'minus') {
+                    var minValue = parseInt(input.attr('data-min'));
+                    if (!minValue) minValue = 1;
+                    
+                    if (currentVal > minValue) {
+                        input.val(currentVal - 1).change();
+                    }
+                    if (parseInt(input.val()) == minValue) {
+                        $(this).attr('disabled', true);
+                    }
+                } else if (type == 'plus') {
+                    var maxValue = parseInt(input.attr('data-max'));
+                    if (!maxValue) maxValue = 999;
+                    
+                    if (currentVal < maxValue) {
+                        input.val(currentVal + 1).change();
+                    }
+                    if (parseInt(input.val()) == maxValue) {
+                        $(this).attr('disabled', true);
+                    }
+                }
+            } else {
+                input.val(1);
+            }
+            
+            // Force input field to update immediately with current value
+            input.trigger("input");
+        });
+        
+        $('.input-number').focusin(function() {
+            $(this).data('oldValue', $(this).val());
+        });
+        
+        $('.input-number').on('change input', function() {
+            var minValue = parseInt($(this).attr('data-min'));
+            var maxValue = parseInt($(this).attr('data-max'));
+            if (!minValue) minValue = 1;
+            if (!maxValue) maxValue = 999;
+            var valueCurrent = parseInt($(this).val()) || 0;
+            
+            var name = $(this).attr('name');
+            if (valueCurrent >= minValue) {
+                $(".btn-number[data-type='minus'][data-field='" + name + "']").removeAttr('disabled');
+            } else {
+                $(this).val(minValue);
+            }
+            if (valueCurrent <= maxValue) {
+                $(".btn-number[data-type='plus'][data-field='" + name + "']").removeAttr('disabled');
+            } else {
+                $(this).val(maxValue);
+            }
+        });
+        
+        $(".input-number").keydown(function(e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                 // Allow: Ctrl+A
+                (e.keyCode == 65 && e.ctrlKey === true) ||
+                 // Allow: home, end, left, right
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                    return;
+            }
+            // Ensure that it's a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+        
+        // Make sure the input values are visible on page load
+        $('.input-number').trigger('input');
+    });
+</script>
+{% endblock %}

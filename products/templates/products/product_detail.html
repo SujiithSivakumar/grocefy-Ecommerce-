@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - Grocefy{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="bread-inner">
+                    <ul class="bread-list">
+                        <li><a href="{% url 'home' %}">Home<i class="ti-arrow-right"></i></a></li>
+                        <li><a href="{% url 'products:product_list' %}">Shop<i class="ti-arrow-right"></i></a></li>
+                        <li class="active"><a href="#">{{ product.name }}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumbs -->
+
+<!-- Shop Single -->
+<section class="shop single section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-lg-6 col-12">
+                        <!-- Product Slider -->
+                        <div class="product-gallery">
+                            <!-- Images slider -->
+                            <div class="flexslider-thumbnails">
+                                <div class="flex-viewport">
+                                    <ul class="slides">
+                                        <li data-thumb="{{ product.image.url }}">
+                                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                        </li>
+                                        {% for image in product.images.all %}
+                                        <li data-thumb="{{ image.image.url }}">
+                                            <img src="{{ image.image.url }}" alt="{{ product.name }}">
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Product slider -->
+                    </div>
+                    <div class="col-lg-6 col-12">
+                        <div class="product-des">
+                            <!-- Description -->
+                            <div class="short">
+                                <h4>{{ product.name }}</h4>
+                                <div class="rating-main">
+                                    <ul class="rating">
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star-half-o"></i></li>
+                                        <li class="dark"><i class="fa fa-star-o"></i></li>
+                                    </ul>
+                                    <a href="#" class="total-review">(102) Review</a>
+                                </div>
+                                <p class="price">
+                                    {% if product.discount_price %}
+                                        <span>₹{{ product.discount_price }}</span>
+                                        <s>₹{{ product.price }}</s>
+                                    {% else %}
+                                        <span>₹{{ product.price }}</span>
+                                    {% endif %}
+                                </p>
+                                <p class="description">{{ product.description|linebreaks }}</p>
+                            </div>
+                            <!--/ End Description -->
+                            <!-- Color & Size -->
+                            <div class="size-color">
+                                <div class="row">
+                                    {% if product.colors.exists %}
+                                    <div class="col-lg-6 col-12">
+                                        <div class="form-group color-option">
+                                            <label class="title-label">Choose color</label>
+                                            <select class="form-control" name="color">
+                                                {% for color in product.colors.all %}
+                                                <option value="{{ color.id }}">{{ color.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if product.sizes.exists %}
+                                    <div class="col-lg-6 col-12">
+                                        <div class="form-group">
+                                            <label class="title-label">Choose Size</label>
+                                            <select class="form-control" name="size">
+                                                {% for size in product.sizes.all %}
+                                                <option value="{{ size.id }}">{{ size.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <!--/ End Color & Size -->
+                            <!-- Product Buy -->
+                            <div class="product-buy">
+                                <form method="post" action="{% url 'cart:cart_add' product.id %}">
+                                    {% csrf_token %}
+                                    <div class="quantity">
+                                        <h6>Quantity :</h6>
+                                        <!-- Input Order -->
+                                        <div class="input-group">
+                                            <div class="button minus">
+                                                <button type="button" class="btn btn-primary btn-number" data-type="minus" data-field="quantity">
+                                                    <i class="ti-minus"></i>
+                                                </button>
+                                            </div>
+                                            <input type="text" name="quantity" class="input-number" data-min="1" data-max="{{ product.stock }}" value="1">
+                                            <div class="button plus">
+                                                <button type="button" class="btn btn-primary btn-number" data-type="plus" data-field="quantity">
+                                                    <i class="ti-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <!--/ End Input Order -->
+                                    </div>
+                                    <div class="add-to-cart">
+                                        <button type="submit" class="btn">Add to cart</button>
+                                        <a href="{% url 'cart:cart_detail' %}" class="btn min"><i class="ti-heart"></i></a>
+                                    </div>
+                                </form>
+                                <p class="cat">Category :<a href="{% url 'products:product_list' %}?category={{ product.category.slug }}">{{ product.category.name }}</a></p>
+                                <p class="availability">Availability : {% if product.stock > 0 %}{{ product.stock }} Products In Stock{% else %}Out Of Stock{% endif %}</p>
+                            </div>
+                            <!--/ End Product Buy -->
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="product-info">
+                            <div class="nav-main">
+                                <!-- Tab Nav -->
+                                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                    <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#description" role="tab">Description</a></li>
+                                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#reviews" role="tab">Reviews</a></li>
+                                </ul>
+                                <!--/ End Tab Nav -->
+                            </div>
+                            <div class="tab-content" id="myTabContent">
+                                <!-- Description Tab -->
+                                <div class="tab-pane fade show active" id="description" role="tabpanel">
+                                    <div class="tab-single">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="single-des">
+                                                    {{ product.description|linebreaks }}
+                                                </div>
+                                                {% if product.specifications %}
+                                                <div class="single-des">
+                                                    <h4>Product Specifications:</h4>
+                                                    {{ product.specifications|linebreaks }}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--/ End Description Tab -->
+                                <!-- Reviews Tab -->
+                                <div class="tab-pane fade" id="reviews" role="tabpanel">
+                                    <div class="tab-single review-panel">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <!-- Review -->
+                                                <div class="comment-review">
+                                                    <div class="add-review">
+                                                        <h5>Add A Review</h5>
+                                                        <p>Your email address will not be published. Required fields are marked</p>
+                                                    </div>
+                                                    <h4>Your Rating <span class="text-danger">*</span></h4>
+                                                    <div class="review-inner">
+                                                        <div class="ratings">
+                                                            <ul class="rating">
+                                                                <li><i class="fa fa-star"></i></li>
+                                                                <li><i class="fa fa-star"></i></li>
+                                                                <li><i class="fa fa-star"></i></li>
+                                                                <li><i class="fa fa-star"></i></li>
+                                                                <li><i class="fa fa-star"></i></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--/ End Review -->
+                                                <!-- Form -->
+                                                <form class="form" method="post" action="#">
+                                                    {% csrf_token %}
+                                                    <div class="row">
+                                                        <div class="col-lg-6 col-12">
+                                                            <div class="form-group">
+                                                                <label>Your Name<span>*</span></label>
+                                                                <input type="text" name="name" required="required">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6 col-12">
+                                                            <div class="form-group">
+                                                                <label>Your Email<span>*</span></label>
+                                                                <input type="email" name="email" required="required">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-12 col-12">
+                                                            <div class="form-group">
+                                                                <label>Write a review<span>*</span></label>
+                                                                <textarea name="review" rows="6" required="required"></textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-12 col-12">
+                                                            <div class="form-group button">
+                                                                <button type="submit" class="btn">Submit</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                                <!--/ End Form -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--/ End Reviews Tab -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!--/ End Shop Single -->
+
+<!-- Start Most Popular -->
+<div class="product-area most-popular related-product section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="section-title">
+                    <h2>Related Products</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="owl-carousel popular-slider">
+                    {% for related in related_products %}
+                    <!-- Start Single Product -->
+                    <div class="single-product">
+                        <div class="product-img">
+                            <a href="{% url 'products:product_detail' related.slug %}">
+                                <img class="default-img" src="{{ related.image.url }}" alt="{{ related.name }}">
+                                {% if related.images.first %}
+                                <img class="hover-img" src="{{ related.images.first.image.url }}" alt="{{ related.name }}">
+                                {% endif %}
+                                {% if related.is_sale %}
+                                <span class="out-of-stock">Sale</span>
+                                {% endif %}
+                            </a>
+                            <div class="button-head">
+                                <div class="product-action">
+                                    <a data-toggle="modal" data-target="#exampleModal" title="Quick View" href="#"><i class=" ti-eye"></i><span>Quick Shop</span></a>
+                                    <a title="Wishlist" href="#"><i class=" ti-heart "></i><span>Add to Wishlist</span></a>
+                                    <a title="Compare" href="#"><i class="ti-bar-chart-alt"></i><span>Add to Compare</span></a>
+                                </div>
+                                <div class="product-action-2">
+                                    <a title="Add to cart" href="{% url 'cart:cart_add' related.id %}">Add to cart</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3><a href="{% url 'products:product_detail' related.slug %}">{{ related.name }}</a></h3>
+                            <div class="product-price">
+                                {% if related.discount_price %}
+                                    <span>₹{{ related.discount_price }}</span>
+                                    <del>₹{{ related.price }}</del>
+                                {% else %}
+                                    <span>₹{{ related.price }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Single Product -->
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Most Popular Area -->
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize FlexSlider
+        $('.flexslider-thumbnails').flexslider({
+            animation: "slide",
+            controlNav: "thumbnails"
+        });
+
+        // Quantity buttons
+        $('.btn-number').click(function(e) {
+            e.preventDefault();
+            var type = $(this).data('type');
+            var input = $('input[name="quantity"]');
+            var currentVal = parseInt(input.val());
+            
+            if (type === 'minus') {
+                if (currentVal > input.data('min')) {
+                    input.val(currentVal - 1).change();
+                }
+            } else if (type === 'plus') {
+                if (currentVal < input.data('max')) {
+                    input.val(currentVal + 1).change();
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

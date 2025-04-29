@@ -1,0 +1,134 @@
+{% load i18n static %}
+{% if result_hidden_fields %}
+<div class="hiddenfields">{# DIV for HTML validation #}
+{% for item in result_hidden_fields %}{{ item }}{% endfor %}
+</div>
+{% endif %}
+{% if results %}
+<div class="table-responsive">
+  <table id="product-dataTable" class="table table-bordered" width="100%" cellspacing="0">
+    <thead>
+      <tr>
+        {% for header in result_headers %}
+          <th scope="col" {{ header.class_attrib }}>
+            {% if header.sortable %}
+              {% if header.sort_priority > 0 %}
+                <div class="sortoptions">
+                  <a class="sortremove" href="{{ header.url_remove }}" title="{% trans "Remove from sorting" %}">
+                    <span class="sortremove fas fa-times"></span>
+                  </a>
+                  {% if num_sorted_fields > 1 %}<span class="sortpriority" title="{% trans "Sorting priority: %(priority_number)s" %}">{{ header.sort_priority }}</span>{% endif %}
+                  <a href="{{ header.url_toggle }}" class="toggle {% if header.ascending %}ascending{% else %}descending{% endif %}" title="{% trans "Toggle sorting" %}">
+                    {% if header.ascending %}<span class="fas fa-sort-up"></span>{% else %}<span class="fas fa-sort-down"></span>{% endif %}
+                  </a>
+                </div>
+              {% endif %}
+            {% endif %}
+            <div class="text">{% if header.sortable %}<a href="{{ header.url_primary }}">{{ header.text|capfirst }}</a>{% else %}<span>{{ header.text|capfirst }}</span>{% endif %}</div>
+          </th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tfoot>
+      <tr>
+        {% for header in result_headers %}
+          <th>{{ header.text|capfirst }}</th>
+        {% endfor %}
+      </tr>
+    </tfoot>
+    <tbody>
+    {% for result in results %}
+      {% if result.form and result.form.non_field_errors %}
+        <tr><td colspan="{{ result|length }}">{{ result.form.non_field_errors }}</td></tr>
+      {% endif %}
+      <tr class="{% cycle 'row1' 'row2' %}">
+        {% for item in result %}
+          {% if forloop.counter0 == 0 %}
+            <!-- ID Column -->
+            <td>{{ item }}</td>
+          {% elif forloop.counter0 == 1 %}
+            <!-- Title Column -->
+            <td>{{ item }}</td>
+          {% elif forloop.counter0 == 2 %}
+            <!-- Category Column -->
+            <td>
+              {{ item }}
+            </td>
+          {% elif forloop.counter0 == 3 %}
+            <!-- Is Featured Column -->
+            <td>
+              {% if 'is_featured' in item|striptags %}
+                {% if "checked" in item %}Yes{% else %}No{% endif %}
+              {% else %}
+                {{ item }}
+              {% endif %}
+            </td>
+          {% elif forloop.counter0 == 4 %}
+            <!-- Price Column -->
+            <td>Rs. {{ item }} /-</td>
+          {% elif forloop.counter0 == 5 %}
+            <!-- Discount Column -->
+            <td>{{ item }}% OFF</td>
+          {% elif forloop.counter0 == 6 %}
+            <!-- Size Column -->
+            <td>{{ item }}</td>
+          {% elif forloop.counter0 == 7 %}
+            <!-- Condition Column -->
+            <td>{{ item }}</td>
+          {% elif forloop.counter0 == 8 %}
+            <!-- Brand Column -->
+            <td>{{ item }}</td>
+          {% elif forloop.counter0 == 9 %}
+            <!-- Stock Column -->
+            <td>
+              {% if "0" == item|striptags %}
+                <span class="badge badge-danger">{{ item }}</span>
+              {% else %}
+                <span class="badge badge-primary">{{ item }}</span>
+              {% endif %}
+            </td>
+          {% elif forloop.counter0 == 10 %}
+            <!-- Photo Column -->
+            <td class="field-photo text-center">
+              {% if "img src" in item|striptags %}
+                <img src="{{ item|striptags|slice:'9:-2' }}" class="img-fluid zoom" style="max-width:80px" alt="product-image">
+              {% else %}
+                <img src="{% static 'backend/img/thumbnail-default.jpg' %}" class="img-fluid" style="max-width:80px" alt="default-image">
+              {% endif %}
+            </td>
+          {% elif forloop.counter0 == 11 %}
+            <!-- Status Column -->
+            <td class="field-status text-center">
+              {% if "active" in item|striptags|lower %}
+                <span class="badge badge-success">active</span>
+              {% else %}
+                <span class="badge badge-warning">inactive</span>
+              {% endif %}
+            </td>
+          {% elif forloop.last %}
+            <!-- Actions Column -->
+            <td class="field-action text-center">
+              {% if "changelink" in item|striptags %}
+                <a href="{% url 'admin:products_product_change' result.pk.value %}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" title="edit" data-placement="bottom">
+                  <i class="fas fa-edit"></i>
+                </a>
+              {% endif %}
+              {% if "deletelink" in item|striptags %}
+                <form method="POST" action="{% url 'admin:products_product_delete' result.pk.value %}" class="d-inline">
+                  {% csrf_token %}
+                  <button class="btn btn-danger btn-sm dltBtn" style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" data-placement="bottom" title="Delete">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </form>
+              {% endif %}
+            </td>
+          {% else %}
+            <td>{{ item }}</td>
+          {% endif %}
+        {% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
