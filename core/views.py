@@ -44,60 +44,123 @@ def home(request):
     if table_exists('products_banner'):
         # Get main banners for slider
         try:
-            banners = Banner.objects.all().order_by('-id')[:3]
-            # Get banners for mid section
-            mid_banners = Banner.objects.all().order_by('-id')[3:5]
+            # Create dummy banners with placeholder image if no images exist
+            banners_query = Banner.objects.all().order_by('-id')[:3]
+            banners = []
+            
+            # Check if we have any banners, if not or if they have image issues, use placeholders
+            if not banners_query.exists():
+                # No database items, we'll use empty list (already initialized)
+                pass
+            else:
+                # Process banners to ensure they don't cause template errors
+                for banner in banners_query:
+                    # Only include banners with valid images or set image to None
+                    try:
+                        # Access image URL to trigger any potential errors
+                        if banner.image and hasattr(banner.image, 'url'):
+                            img_url = banner.image.url
+                            banners.append(banner)
+                    except (ValueError, FileNotFoundError, AttributeError):
+                        # Skip banners with image issues
+                        print(f"Skipping banner {banner.id} due to image issues")
+                        pass
+            
+            # Same approach for mid banners
+            mid_banners_query = Banner.objects.all().order_by('-id')[3:5]
+            mid_banners = []
+            
+            for banner in mid_banners_query:
+                try:
+                    if banner.image and hasattr(banner.image, 'url'):
+                        img_url = banner.image.url
+                        mid_banners.append(banner)
+                except (ValueError, FileNotFoundError, AttributeError):
+                    pass
+                    
         except Exception as e:
             print(f"Error fetching banners: {str(e)}")
     
     if table_exists('products_category'):
         try:
             # Get featured categories
-            featured_categories = Category.objects.filter(
-                is_active=True, 
-                parent=None
-            ).order_by('-id')[:3]
+            categories_query = Category.objects.filter(is_active=True, parent=None).order_by('-id')[:3]
+            featured_categories = []
+            
+            # Process categories to ensure they don't cause template errors
+            for category in categories_query:
+                try:
+                    # Test image access
+                    if not category.image or not hasattr(category.image, 'url'):
+                        # If image is missing, set it to None to avoid template errors
+                        category.image = None
+                    featured_categories.append(category)
+                except (ValueError, FileNotFoundError, AttributeError):
+                    # Still append the category but with image set to None
+                    category.image = None
+                    featured_categories.append(category)
             
             # Get all categories for the product filter
-            categories = Category.objects.filter(is_active=True, parent=None)
+            categories_query = Category.objects.filter(is_active=True, parent=None)
+            categories = []
+            
+            for category in categories_query:
+                try:
+                    if not category.image or not hasattr(category.image, 'url'):
+                        category.image = None
+                    categories.append(category)
+                except (ValueError, FileNotFoundError, AttributeError):
+                    category.image = None
+                    categories.append(category)
+                    
         except Exception as e:
             print(f"Error fetching categories: {str(e)}")
     
     if table_exists('products_product'):
         try:
+            # Process products to handle missing images
+            def process_products_query(query):
+                result = []
+                for product in query:
+                    try:
+                        if not product.image or not hasattr(product.image, 'url'):
+                            product.image = None
+                        result.append(product)
+                    except (ValueError, FileNotFoundError, AttributeError):
+                        product.image = None
+                        result.append(product)
+                return result
+            
             # Get new arrivals (products)
-            new_products = Product.objects.filter(
-                is_active=True
-            ).order_by('-created_at')[:8]
+            new_products = process_products_query(
+                Product.objects.filter(is_active=True).order_by('-created_at')[:8]
+            )
             
             # Get featured products
-            featured_products = Product.objects.filter(
-                is_featured=True,
-                is_active=True
-            ).order_by('-id')[:8]
+            featured_products = process_products_query(
+                Product.objects.filter(is_featured=True, is_active=True).order_by('-id')[:8]
+            )
             
             # Get products with discount (top selling as placeholder)
-            top_selling_products = Product.objects.filter(
-                is_active=True,
-                discount_price__isnull=False
-            ).order_by('-id')[:8]
+            top_selling_products = process_products_query(
+                Product.objects.filter(is_active=True, discount_price__isnull=False).order_by('-id')[:8]
+            )
             
             # Get popular products
-            popular_products = Product.objects.filter(
-                is_active=True,
-                is_featured=True
-            ).order_by('-id')[:8]
+            popular_products = process_products_query(
+                Product.objects.filter(is_active=True, is_featured=True).order_by('-id')[:8]
+            )
             
             # Get all active products for product list
-            product_lists = Product.objects.filter(
-                is_active=True
-            ).order_by('-created_at')[:16]
+            product_lists = process_products_query(
+                Product.objects.filter(is_active=True).order_by('-created_at')[:16]
+            )
             
             # Use hot products as latest posts placeholder
-            latest_posts = Product.objects.filter(
-                is_active=True, 
-                is_featured=True
-            ).order_by('-created_at')[:3]
+            latest_posts = process_products_query(
+                Product.objects.filter(is_active=True, is_featured=True).order_by('-created_at')[:3]
+            )
+                
         except Exception as e:
             print(f"Error fetching products: {str(e)}")
     

@@ -1,0 +1,27 @@
+{% load static %}
+
+<a href="{% url 'core:home' %}" class="logo">
+    <!-- Try media image first, fall back to static image, then to text if neither exists -->
+    {% if logo_url and logo_url != 'None' %}
+        <img src="{{ logo_url }}" alt="Grocefy">
+    {% else %}
+        <span class="text-logo">
+            <strong>Grocefy</strong>
+            <span class="tagline">Fresh Groceries Delivered</span>
+        </span>
+    {% endif %}
+</a>
+
+<style>
+    .text-logo {
+        display: inline-block;
+        font-size: 24px;
+        color: #157ed2;
+        font-weight: bold;
+    }
+    .tagline {
+        display: block;
+        font-size: 12px;
+        font-weight: normal;
+    }
+</style>

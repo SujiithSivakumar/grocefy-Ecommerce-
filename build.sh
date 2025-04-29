@@ -5,6 +5,14 @@ set -o errexit
 # Install Python dependencies
 pip install -r requirements.txt
 
+# Set up media directory structure
+mkdir -p media/banners
+mkdir -p media/categories
+mkdir -p media/brands
+mkdir -p media/products
+mkdir -p media/images
+mkdir -p staticfiles/images
+
 # Run migrations
 python manage.py migrate
 
@@ -13,6 +21,8 @@ python manage.py shell << EOF
 from django.contrib.auth import get_user_model
 from products.models import Category, Brand, Banner, Product
 import os
+from django.conf import settings
+import shutil
 
 User = get_user_model()
 
@@ -37,7 +47,6 @@ if Brand.objects.count() == 0:
 
 # Create sample banner if none exist
 if Banner.objects.count() == 0:
-    # Only create banner if image files exist in the media folder
     banner = Banner.objects.create(
         title="Welcome to Grocefy",
         slug="welcome-banner",
@@ -89,6 +98,24 @@ if Product.objects.count() == 0 and Category.objects.count() > 0 and Brand.objec
     )
     
     print(f"Created {Product.objects.count()} sample products")
+
+# Create a default logo in static folder
+static_images_dir = os.path.join(settings.STATIC_ROOT, 'images')
+os.makedirs(static_images_dir, exist_ok=True)
+
+# Create a simple text file explaining about media files
+with open(os.path.join(settings.MEDIA_ROOT, 'README.txt'), 'w') as f:
+    f.write("""
+    This directory is for uploaded media files.
+    
+    In the deployed environment, image files uploaded through the admin interface
+    will be stored here but will be lost on redeployment due to Render's ephemeral filesystem.
+    
+    For a production environment, consider using an external storage service like AWS S3 
+    or Cloudinary for persistent media storage.
+    """)
+
+print("Media directories created successfully.")
 EOF
 
 # Collect static files

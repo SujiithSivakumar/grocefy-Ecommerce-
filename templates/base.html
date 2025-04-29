@@ -349,7 +349,14 @@
                     <div class="col-lg-3">
                         <div class="logo">
                             <a href="{% url 'core:home' %}">
-                                <img src="/media/images/logo1.png" alt="Grocefy Logo" style="max-width: 140px;">
+                                {% if site_settings.logo %}
+                                    <img src="{{ site_settings.logo.url }}" alt="Grocefy Logo" style="max-width: 140px;">
+                                {% else %}
+                                    <span class="text-logo">
+                                        <strong>Grocefy</strong>
+                                        <span class="tagline">Fresh Groceries Delivered</span>
+                                    </span>
+                                {% endif %}
                             </a>
                         </div>
                     </div>
@@ -465,7 +472,14 @@
                 <!-- Logo and Description -->
                 <div class="col-lg-4 col-md-6 mb-4">
                     <a href="{% url 'core:home' %}">
-                        <img src="/media/images/logo.png" alt="Grocefy" class="mb-4" style="max-width: 200px;">
+                        {% if site_settings.logo %}
+                            <img src="{{ site_settings.logo.url }}" alt="Grocefy" class="mb-4" style="max-width: 200px;">
+                        {% else %}
+                            <span class="text-logo" style="color: white; font-size: 28px; font-weight: bold;">
+                                Grocefy
+                                <span style="display: block; font-size: 14px; font-weight: normal;">Fresh Groceries Delivered</span>
+                            </span>
+                        {% endif %}
                     </a>
                     <p style="color: #b4b4b4; line-height: 1.8;">
                         Grocefy is an online grocery platform designed to make your shopping experience fast, convenient, and reliable. We offer a wide range of fresh produce, pantry items, beverages, and more at competitive prices. Our user-friendly website ensures seamless browsing, secure payments, and personalized recommendations.
