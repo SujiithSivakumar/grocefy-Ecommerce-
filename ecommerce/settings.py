@@ -30,8 +30,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-l)8%_tjho*uielj*z@a0yv-=3(
 # Set DEBUG to False by default for production
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-
+# Update ALLOWED_HOSTS to include Render domain
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,grocefy.onrender.com').split(',')
 
 # Application definition
 
