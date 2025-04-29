@@ -20,60 +20,86 @@ import json
 import random  # For demo data only
 import os
 import subprocess
+from django.db import connection
 
 def home(request):
-    # Get featured categories
-    featured_categories = Category.objects.filter(
-        is_active=True, 
-        parent=None
-    ).order_by('-id')[:3]
+    # Check if the database tables exist to avoid errors during initial deployment
+    def table_exists(table_name):
+        with connection.cursor() as cursor:
+            return table_name in connection.introspection.table_names(cursor)
     
-    # Get new arrivals (products)
-    new_products = Product.objects.filter(
-        is_active=True
-    ).order_by('-created_at')[:8]
+    # Initialize empty containers for context data
+    banners = []
+    mid_banners = []
+    featured_categories = []
+    new_products = []
+    featured_products = []
+    top_selling_products = []
+    popular_products = []
+    latest_posts = []
+    categories = []
+    product_lists = []
     
-    # Get featured products
-    featured_products = Product.objects.filter(
-        is_featured=True,
-        is_active=True
-    ).order_by('-id')[:8]
+    # Only query models if their tables exist in the database
+    if table_exists('products_banner'):
+        # Get main banners for slider
+        try:
+            banners = Banner.objects.all().order_by('-id')[:3]
+            # Get banners for mid section
+            mid_banners = Banner.objects.all().order_by('-id')[3:5]
+        except Exception as e:
+            print(f"Error fetching banners: {str(e)}")
     
-    # Get products with discount (top selling as placeholder)
-    top_selling_products = Product.objects.filter(
-        is_active=True,
-        discount_price__isnull=False
-    ).order_by('-id')[:8]
+    if table_exists('products_category'):
+        try:
+            # Get featured categories
+            featured_categories = Category.objects.filter(
+                is_active=True, 
+                parent=None
+            ).order_by('-id')[:3]
+            
+            # Get all categories for the product filter
+            categories = Category.objects.filter(is_active=True, parent=None)
+        except Exception as e:
+            print(f"Error fetching categories: {str(e)}")
     
-    # Get main banners for slider - MODIFIED: No try/except block to ensure we see any errors
-    # And retrieving all banners without the 'active' filter that might be causing issues
-    banners = Banner.objects.all().order_by('-id')[:3]
-    print(f"DEBUG - Banner count: {banners.count()}")
-    for banner in banners:
-        print(f"Banner: {banner.id} - {banner.title} - Image: {banner.image}")
-    
-    # Get banners for mid section
-    mid_banners = Banner.objects.all().order_by('-id')[3:5]
-    
-    # Get popular products
-    popular_products = Product.objects.filter(
-        is_active=True,
-        is_featured=True
-    ).order_by('-id')[:8]
-    
-    # Get all active products for product list
-    product_lists = Product.objects.filter(
-        is_active=True
-    ).order_by('-created_at')[:16]
-    
-    # Use hot products as latest posts placeholder
-    latest_posts = Product.objects.filter(
-        is_active=True, 
-        is_featured=True
-    ).order_by('-created_at')[:3]
-    
-    # Get all categories for the product filter
-    categories = Category.objects.filter(is_active=True, parent=None)
+    if table_exists('products_product'):
+        try:
+            # Get new arrivals (products)
+            new_products = Product.objects.filter(
+                is_active=True
+            ).order_by('-created_at')[:8]
+            
+            # Get featured products
+            featured_products = Product.objects.filter(
+                is_featured=True,
+                is_active=True
+            ).order_by('-id')[:8]
+            
+            # Get products with discount (top selling as placeholder)
+            top_selling_products = Product.objects.filter(
+                is_active=True,
+                discount_price__isnull=False
+            ).order_by('-id')[:8]
+            
+            # Get popular products
+            popular_products = Product.objects.filter(
+                is_active=True,
+                is_featured=True
+            ).order_by('-id')[:8]
+            
+            # Get all active products for product list
+            product_lists = Product.objects.filter(
+                is_active=True
+            ).order_by('-created_at')[:16]
+            
+            # Use hot products as latest posts placeholder
+            latest_posts = Product.objects.filter(
+                is_active=True, 
+                is_featured=True
+            ).order_by('-created_at')[:3]
+        except Exception as e:
+            print(f"Error fetching products: {str(e)}")
     
     context = {
         'featured_categories': featured_categories,
