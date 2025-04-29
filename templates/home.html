@@ -253,7 +253,11 @@
     {% if banners %}
         {% for banner in banners %}
             <div class="slide">
-                <img src="{{ banner.image.url }}" alt="{{ banner.title }}">
+                {% if banner.image and banner.image.url %}
+                    <img src="{{ banner.image.url }}" alt="{{ banner.title }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/1920x500/3498db/ffffff?text=Grocefy" alt="{{ banner.title|default:'Fresh Groceries' }}">
+                {% endif %}
                 <div class="banner-caption">
                     <h1>{{ banner.title }}</h1>
                     <p>{{ banner.description|safe }}</p>
@@ -301,7 +305,7 @@
                     <!-- Single Banner  -->
                     <div class="col-lg-4 col-md-6 col-12">
                         <div class="single-banner">
-                            {% if cat.image %}
+                            {% if cat.image and cat.image.url %}
                                 <img src="{{ cat.image.url }}" alt="{{ cat.name }}">
                             {% else %}
                                 <img src="https://via.placeholder.com/600x370" alt="#">
@@ -389,8 +393,13 @@
                                     <div class="single-product">
                                         <div class="product-img">
                                             <a href="{% url 'products:product_detail' product.slug %}">
-                                                <img class="default-img" src="{{ product.image.url }}" alt="{{ product.name }}">
-                                                <img class="hover-img" src="{{ product.image.url }}" alt="{{ product.name }}">
+                                                {% if product.image and product.image.url %}
+                                                    <img class="default-img" src="{{ product.image.url }}" alt="{{ product.name }}">
+                                                    <img class="hover-img" src="{{ product.image.url }}" alt="{{ product.name }}">
+                                                {% else %}
+                                                    <img class="default-img" src="https://via.placeholder.com/600x600/cccccc/ffffff?text=No+Image" alt="{{ product.name }}">
+                                                    <img class="hover-img" src="https://via.placeholder.com/600x600/cccccc/ffffff?text=No+Image" alt="{{ product.name }}">
+                                                {% endif %}
                                                 {% if product.stock <= 0 %}
                                                     <span class="out-of-stock">Sale out</span>
                                                 {% elif product.condition == 'new' %}
@@ -442,7 +451,11 @@
             {% for banner in mid_banners %}
             <div class="col-lg-6 col-md-6 col-12">
                 <div class="single-banner">
-                    <img src="{{ banner.image.url }}" alt="{{ banner.title }}">
+                    {% if banner.image and banner.image.url %}
+                        <img src="{{ banner.image.url }}" alt="{{ banner.title }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/800x500/cccccc/ffffff?text=Grocefy+Banner" alt="{{ banner.title|default:'Special Offer' }}">
+                    {% endif %}
                     <div class="content">
                         <p>{{ banner.description|default:"Special Offers" }}</p>
                         <h3>{{ banner.title|default:"Seasonal Sale" }}</h3>
@@ -474,8 +487,13 @@
                         <div class="single-product">
                             <div class="product-img">
                                 <a href="{% url 'products:product_detail' product.slug %}">
-                                    <img class="default-img" src="{{ product.image.url }}" alt="{{ product.name }}">
-                                    <img class="hover-img" src="{{ product.image.url }}" alt="{{ product.name }}">
+                                    {% if product.image and product.image.url %}
+                                        <img class="default-img" src="{{ product.image.url }}" alt="{{ product.name }}">
+                                        <img class="hover-img" src="{{ product.image.url }}" alt="{{ product.name }}">
+                                    {% else %}
+                                        <img class="default-img" src="https://via.placeholder.com/600x600/cccccc/ffffff?text=No+Image" alt="{{ product.name }}">
+                                        <img class="hover-img" src="https://via.placeholder.com/600x600/cccccc/ffffff?text=No+Image" alt="{{ product.name }}">
+                                    {% endif %}
                                 </a>
                                 <div class="button-head">
                                     <div class="product-action">
@@ -527,7 +545,11 @@
                                 <div class="row">
                                     <div class="col-lg-6 col-md-6 col-12">
                                         <div class="list-image overlay">
-                                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                            {% if product.image and product.image.url %}
+                                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                            {% else %}
+                                                <img src="https://via.placeholder.com/600x600/cccccc/ffffff?text=No+Image" alt="{{ product.name }}">
+                                            {% endif %}
                                             <a href="{% url 'cart:cart_add' product.id %}" class="buy"><i class="fa fa-shopping-bag"></i></a>
                                         </div>
                                     </div>
