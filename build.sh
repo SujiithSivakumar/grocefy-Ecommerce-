@@ -8,5 +8,88 @@ pip install -r requirements.txt
 # Run migrations
 python manage.py migrate
 
+# Create initial data through a Python script
+python manage.py shell << EOF
+from django.contrib.auth import get_user_model
+from products.models import Category, Brand, Banner, Product
+import os
+
+User = get_user_model()
+
+# Create a superuser if it doesn't exist
+if not User.objects.filter(username='admin').exists():
+    User.objects.create_superuser('admin', 'admin@example.com', 'render2025')
+    print("Superuser created successfully!")
+
+# Create sample categories if none exist
+if Category.objects.count() == 0:
+    category1 = Category.objects.create(name="Fruits & Vegetables", slug="fruits-vegetables", is_active=True)
+    category2 = Category.objects.create(name="Dairy & Bakery", slug="dairy-bakery", is_active=True)
+    category3 = Category.objects.create(name="Staples", slug="staples", is_active=True)
+    print(f"Created {Category.objects.count()} sample categories")
+
+# Create sample brands if none exist
+if Brand.objects.count() == 0:
+    brand1 = Brand.objects.create(name="Fresh Farms", slug="fresh-farms", is_active=True)
+    brand2 = Brand.objects.create(name="Nature's Best", slug="natures-best", is_active=True)
+    brand3 = Brand.objects.create(name="Healthy Choice", slug="healthy-choice", is_active=True)
+    print(f"Created {Brand.objects.count()} sample brands")
+
+# Create sample banner if none exist
+if Banner.objects.count() == 0:
+    # Only create banner if image files exist in the media folder
+    banner = Banner.objects.create(
+        title="Welcome to Grocefy",
+        slug="welcome-banner",
+        description="Your one-stop shop for fresh groceries",
+        status="active"
+    )
+    print(f"Created {Banner.objects.count()} sample banner")
+
+# Create sample products if none exist
+if Product.objects.count() == 0 and Category.objects.count() > 0 and Brand.objects.count() > 0:
+    category = Category.objects.first()
+    brand = Brand.objects.first()
+    
+    product1 = Product.objects.create(
+        name="Fresh Apples",
+        slug="fresh-apples",
+        category=category,
+        brand=brand,
+        description="Crisp and juicy apples fresh from the orchard",
+        price=2.99,
+        stock=100,
+        is_active=True,
+        is_featured=True
+    )
+    
+    product2 = Product.objects.create(
+        name="Organic Bananas",
+        slug="organic-bananas",
+        category=category,
+        brand=brand,
+        description="Sweet and nutritious organic bananas",
+        price=1.99,
+        discount_price=1.49,
+        stock=150,
+        is_active=True,
+        is_featured=True
+    )
+    
+    product3 = Product.objects.create(
+        name="Fresh Milk",
+        slug="fresh-milk",
+        category=Category.objects.get(name="Dairy & Bakery"),
+        brand=Brand.objects.get(name="Nature's Best"),
+        description="Farm fresh milk",
+        price=3.49,
+        stock=50,
+        is_active=True,
+        is_featured=False
+    )
+    
+    print(f"Created {Product.objects.count()} sample products")
+EOF
+
 # Collect static files
 python manage.py collectstatic --no-input
